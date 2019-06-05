@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="300">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout>
+                <pattern>%-5p|%d{yyyy-MM-dd HH:mm:ss,SSS}|%X{TRACE_ID}|%t|%C{1}:%L|%m%n</pattern>
+            </PatternLayout>
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+        <!--记录druid-sql的记录-->
+        <!--<AsyncLogger name="druid.sql.Statement" level="debug" additivity="false">-->
+            <!--<AppenderRef ref="Console"/>-->
+        <!--</AsyncLogger>-->
+        <!--<AsyncLogger name="druid.sql.ResultSet" level="debug" additivity="false">-->
+            <!--<AppenderRef ref="Console"/>-->
+        <!--</AsyncLogger>-->
+
+        <AsyncRoot level="INFO" includeLocation="true" additivity="false">
+            <AppenderRef ref="Console"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>
