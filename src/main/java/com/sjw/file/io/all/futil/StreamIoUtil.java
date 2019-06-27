@@ -13,6 +13,9 @@ import java.io.OutputStream;
  * @date 2019/6/5
  */
 public class StreamIoUtil implements FileStandardUtil {
+
+    public static StreamIoUtil instance = new StreamIoUtil();
+
     @Override
     public void sequenceWrite(File file, byte[] bytes) throws IOException {
         OutputStream output = new FileOutputStream(file);

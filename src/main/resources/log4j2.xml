@@ -6,20 +6,35 @@
                 <pattern>%-5p|%d{yyyy-MM-dd HH:mm:ss,SSS}|%X{TRACE_ID}|%t|%C{1}:%L|%m%n</pattern>
             </PatternLayout>
         </Console>
-
+        <RollingFile name="RollingFile" fileName="${sys:user.home}/logs/file-io-server/file-io-server.log"
+                     filePattern="${sys:user.home}/logs/file-io-server/file-io-server.%d{yyyyMMdd}.log" append="true">
+            <PatternLayout>
+                <pattern>[%-5p][%d{yyyy-MM-dd HH:mm:ss,SSS}][%C{1}:%L] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!--按天分日志-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="ErrorRollingFile" fileName="${sys:user.home}/logs/file-io-server/file-io-server-error.log"
+                     filePattern="${sys:user.home}/logs/file-io-server/file-io-server-error.%d{yyyyMMdd}.log"
+                     append="true">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>[%-5p][%d{yyyy-MM-dd HH:mm:ss,SSS}][%C{1}:%L] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!--按天分日志-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
-        <!--记录druid-sql的记录-->
-        <!--<AsyncLogger name="druid.sql.Statement" level="debug" additivity="false">-->
-            <!--<AppenderRef ref="Console"/>-->
-        <!--</AsyncLogger>-->
-        <!--<AsyncLogger name="druid.sql.ResultSet" level="debug" additivity="false">-->
-            <!--<AppenderRef ref="Console"/>-->
-        <!--</AsyncLogger>-->
-
         <AsyncRoot level="INFO" includeLocation="true" additivity="false">
+            <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="ErrorRollingFile"/>
         </AsyncRoot>
     </Loggers>
 </Configuration>
