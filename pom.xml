@@ -50,6 +50,13 @@
             <version>25.0-jre</version>
         </dependency>
 
+        <!--log4j2 环形队列依赖-->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
         <!--alibaba fastjson-->
         <dependency>
             <groupId>com.alibaba</groupId>
