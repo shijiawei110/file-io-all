@@ -24,8 +24,6 @@ public class WriteController {
 
     private static final String SEQUENCE_WRITE = "seq-write";
 
-
-
     /**
      * stream 顺序写
      */
