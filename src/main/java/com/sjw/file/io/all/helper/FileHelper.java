@@ -1,6 +1,7 @@
 package com.sjw.file.io.all.helper;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author shijiawei
@@ -11,12 +12,12 @@ import java.io.File;
 public class FileHelper {
 
     private static final String BASE_PATH = "/home/file-io/";
-    private static final String STREAM_FALG = "stream";
-    private static final String BUFFER_FALG = "buffer";
-    private static final String FILE_CHANNEL_FALG = "fc";
-    private static final String MMAP_FALG = "mmap";
+    private static final String STREAM_FALG = "stream.txt";
+    private static final String BUFFER_FALG = "buffer.txt";
+    private static final String FILE_CHANNEL_FALG = "fc.txt";
+    private static final String MMAP_FALG = "mmap.txt";
 
-    public static File getFile(int type, String model) {
+    public static File getFile(int type, String model) throws IOException {
         String path = BASE_PATH;
         if (type == 1) {
             path = path + model + "-" + STREAM_FALG;
@@ -33,7 +34,7 @@ public class FileHelper {
         if (file.exists()) {
             file.delete();
         }
-        file.mkdir();
+        file.createNewFile();
         return file;
     }
 
