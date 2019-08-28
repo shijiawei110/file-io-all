@@ -6,8 +6,8 @@
                 <pattern>%-5p|%d{yyyy-MM-dd HH:mm:ss,SSS}|%X{TRACE_ID}|%t|%C{1}:%L|%m%n</pattern>
             </PatternLayout>
         </Console>
-        <RollingFile name="RollingFile" fileName="/home/file-io/logs/file-io-server.log"
-                     filePattern="/home/file-io/logs/file-io-server.%d{yyyyMMdd}.log" append="true">
+        <RollingFile name="RollingFile" fileName="${sys:user.home}/logs/file-io-server.log"
+                     filePattern="${sys:user.home}/logs/file-io-server.%d{yyyyMMdd}.log" append="true">
             <PatternLayout>
                 <pattern>[%-5p][%d{yyyy-MM-dd HH:mm:ss,SSS}][%C{1}:%L] %m%n</pattern>
             </PatternLayout>
@@ -16,8 +16,8 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="ErrorRollingFile" fileName="/home/file-io/logs/file-io-server-error.log"
-                     filePattern="/home/file-io/logs/file-io-server-error.%d{yyyyMMdd}.log"
+        <RollingFile name="ErrorRollingFile" fileName="${sys:user.home}/logs/file-io-server-error.log"
+                     filePattern="${sys:user.home}/logs/file-io-server-error.%d{yyyyMMdd}.log"
                      append="true">
             <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout>
