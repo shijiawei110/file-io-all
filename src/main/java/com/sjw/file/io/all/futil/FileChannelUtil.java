@@ -19,19 +19,23 @@ import java.nio.channels.FileChannel;
 @Slf4j
 public class FileChannelUtil implements FileStandardUtil {
 
+    public static FileChannelUtil instance = new FileChannelUtil();
+
     @Override
     public void sequenceWrite(File file, byte[] bytes) throws IOException {
         LogHelper.logTag("FileChannel顺序写", "start", file, bytes);
         FileChannel fileChannel = getChannel(file);
         try {
             long start = System.currentTimeMillis();
-            //分配直接内存 10M
-            ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024 * 10);
+            //分配直接内存 n MB
+            ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024 * 50);
             buffer.clear();
             buffer.put(bytes);
             //切换到读模式(从buffer读到channel中,对于我们来说是写文件)
             buffer.flip();
             fileChannel.write(buffer);
+            //通知操作系统刷盘
+            fileChannel.force(false);
             LogHelper.calDuration(start);
             buffer.clear();
             //回收堆外内存

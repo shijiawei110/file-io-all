@@ -19,6 +19,9 @@ import java.security.PrivilegedAction;
  * mmap的slice()作用是创造一个指定区间的buffer窗口,但是引用的是同一个buffer : https://janla.iteye.com/blog/322638
  */
 public class MmapUtil implements FileStandardUtil {
+
+    public static MmapUtil instance = new MmapUtil();
+
     @Override
     public void sequenceWrite(File file, byte[] bytes) throws IOException {
         FileChannel fileChannel = getChannel(file);

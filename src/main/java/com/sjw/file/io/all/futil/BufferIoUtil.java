@@ -14,6 +14,8 @@ import java.io.IOException;
  */
 public class BufferIoUtil implements FileStandardUtil {
 
+    public static BufferIoUtil instance = new BufferIoUtil();
+
     @Override
     public void sequenceWrite(File file, byte[] bytes) throws IOException {
         LogHelper.logTag("BufferStreamIo顺序写", "start", file, bytes);

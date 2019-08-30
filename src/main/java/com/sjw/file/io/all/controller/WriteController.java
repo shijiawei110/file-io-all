@@ -1,5 +1,8 @@
 package com.sjw.file.io.all.controller;
 
+import com.sjw.file.io.all.futil.BufferIoUtil;
+import com.sjw.file.io.all.futil.FileChannelUtil;
+import com.sjw.file.io.all.futil.MmapUtil;
 import com.sjw.file.io.all.futil.StreamIoUtil;
 import com.sjw.file.io.all.helper.FileHelper;
 import com.sjw.file.io.all.helper.TxtHelper;
@@ -31,6 +34,37 @@ public class WriteController {
     public void sequenceStream(@RequestParam("size") int size) throws IOException {
         byte[] bytes = TxtHelper.buildTxtByK(size);
         File file = FileHelper.getFile(1, SEQUENCE_WRITE);
-        StreamIoUtil.instance.sequenceWrite(file,bytes);
+        StreamIoUtil.instance.sequenceWrite(file, bytes);
     }
+
+    /**
+     * buffer-io 顺序写
+     */
+    @GetMapping("/sequence/buffer-io")
+    public void sequenceBuffer(@RequestParam("size") int size) throws IOException {
+        byte[] bytes = TxtHelper.buildTxtByK(size);
+        File file = FileHelper.getFile(2, SEQUENCE_WRITE);
+        BufferIoUtil.instance.sequenceWrite(file, bytes);
+    }
+
+    /**
+     * filechannel 顺序写
+     */
+    @GetMapping("/sequence/filechannel")
+    public void sequenceFilechannel(@RequestParam("size") int size) throws IOException {
+        byte[] bytes = TxtHelper.buildTxtByK(size);
+        File file = FileHelper.getFile(3, SEQUENCE_WRITE);
+        FileChannelUtil.instance.sequenceWrite(file, bytes);
+    }
+
+    /**
+     * mmap 顺序写
+     */
+    @GetMapping("/sequence/mmap")
+    public void sequenceMmap(@RequestParam("size") int size) throws IOException {
+        byte[] bytes = TxtHelper.buildTxtByK(size);
+        File file = FileHelper.getFile(4, SEQUENCE_WRITE);
+        MmapUtil.instance.sequenceWrite(file, bytes);
+    }
+
 }
