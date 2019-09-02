@@ -25,16 +25,19 @@ public class FileChannelUtil implements FileStandardUtil {
     public void sequenceWrite(File file, byte[] bytes) throws IOException {
         LogHelper.logTag("FileChannel顺序写", "start", file, bytes);
         FileChannel fileChannel = getChannel(file);
+        //计算需要分配的内存1.5倍
+        int size = bytes.length;
+        size += size >> 1;
         try {
             long start = System.currentTimeMillis();
             //分配直接内存 n MB
-            ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024 * 50);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(size);
             buffer.clear();
             buffer.put(bytes);
             //切换到读模式(从buffer读到channel中,对于我们来说是写文件)
             buffer.flip();
             fileChannel.write(buffer);
-            //通知操作系统刷盘
+            //通知操作系统刷盘（参数为false是指不刷盘文件的自带权限等信息）
             fileChannel.force(false);
             LogHelper.calDuration(start);
             buffer.clear();
