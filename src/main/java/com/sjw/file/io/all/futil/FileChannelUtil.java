@@ -22,7 +22,7 @@ public class FileChannelUtil implements FileStandardUtil {
     public static FileChannelUtil instance = new FileChannelUtil();
 
     @Override
-    public void sequenceWrite(File file, byte[] bytes) throws IOException {
+    public long sequenceWrite(File file, byte[] bytes) throws IOException {
         LogHelper.logTag("FileChannel顺序写", "start", file, bytes);
         FileChannel fileChannel = getChannel(file);
         //计算需要分配的内存1.5倍
@@ -36,16 +36,54 @@ public class FileChannelUtil implements FileStandardUtil {
             buffer.put(bytes);
             //切换到读模式(从buffer读到channel中,对于我们来说是写文件)
             buffer.flip();
-            fileChannel.write(buffer);
+            fileChannel.write(buffer,fileChannel.size());
             //通知操作系统刷盘（参数为false是指不刷盘文件的自带权限等信息）
-            fileChannel.force(false);
+//            fileChannel.force(false);
+            long duration = System.currentTimeMillis() - start;
             LogHelper.calDuration(start);
             buffer.clear();
             //回收堆外内存
-            ((DirectBuffer) buffer).cleaner().clean();
+            if (buffer.isDirect()) {
+                ((DirectBuffer) buffer).cleaner().clean();
+            }
+            return duration;
         } finally {
             fileChannel.close();
             LogHelper.logTag("FileChannel顺序写", "end", file, bytes);
+        }
+    }
+
+    /**
+     * 随机写,多线程并发就可以实现
+     */
+    @Override
+    public long randomWrite(File file, byte[] bytes) throws IOException {
+        LogHelper.logTag("FileChannel随机写", "start", file, bytes);
+        FileChannel fileChannel = getChannel(file);
+        //计算需要分配的内存1.5倍
+        int size = bytes.length;
+        size += size >> 1;
+        long currentPosition = fileChannel.size() / 2;
+        try {
+            long start = System.currentTimeMillis();
+            //分配直接内存 n MB
+            ByteBuffer buffer = ByteBuffer.allocateDirect(size);
+            buffer.clear();
+            buffer.put(bytes);
+            //切换到读模式(从buffer读到channel中,对于我们来说是写文件)
+            buffer.flip();
+            fileChannel.write(buffer, currentPosition);
+            long duration = System.currentTimeMillis() - start;
+            LogHelper.calDuration(start);
+            buffer.clear();
+            //回收堆外内存
+            if (buffer.isDirect()) {
+                ((DirectBuffer) buffer).cleaner().clean();
+            }
+            return duration;
+        } finally {
+            fileChannel.close();
+            LogHelper.logTag("FileChannel随机写", "end", file, bytes);
         }
     }
 

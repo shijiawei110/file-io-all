@@ -17,16 +17,23 @@ public class StreamIoUtil implements FileStandardUtil {
     public static StreamIoUtil instance = new StreamIoUtil();
 
     @Override
-    public void sequenceWrite(File file, byte[] bytes) throws IOException {
+    public long sequenceWrite(File file, byte[] bytes) throws IOException {
         OutputStream output = new FileOutputStream(file);
         try {
             LogHelper.logTag("StreamIo顺序写", "start", file, bytes);
             long start = System.currentTimeMillis();
             output.write(bytes);
+            long duration = System.currentTimeMillis() - start;
             LogHelper.calDuration(start);
+            return duration;
         } finally {
             output.close();
             LogHelper.logTag("StreamIo顺序写", "end", file, bytes);
         }
+    }
+
+    @Override
+    public long randomWrite(File file, byte[] bytes) throws IOException {
+        return 0;
     }
 }

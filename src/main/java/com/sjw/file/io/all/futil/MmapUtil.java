@@ -23,20 +23,46 @@ public class MmapUtil implements FileStandardUtil {
     public static MmapUtil instance = new MmapUtil();
 
     @Override
-    public void sequenceWrite(File file, byte[] bytes) throws IOException {
+    public long sequenceWrite(File file, byte[] bytes) throws IOException {
         FileChannel fileChannel = getChannel(file);
         //范围 0-size 就是映射整个字节的文件 ,不能超过1.5G
-        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileChannel.size());
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length);
         try {
             LogHelper.logTag("Mmap顺序写", "start", file, bytes);
             long start = System.currentTimeMillis();
             //从当前 mmap 指针的位置写入数据
             mappedByteBuffer.put(bytes);
+            //手动同步pageData刷盘
+//            mappedByteBuffer.force();
+            long duration = System.currentTimeMillis() - start;
             LogHelper.calDuration(start);
+            return duration;
         } finally {
             fileChannel.close();
             clean(mappedByteBuffer);
             LogHelper.logTag("Mmap顺序写", "end", file, bytes);
+        }
+    }
+
+    @Override
+    public long randomWrite(File file, byte[] bytes) throws IOException {
+        FileChannel fileChannel = getChannel(file);
+        long currentPosition = fileChannel.size() / 2;
+        //范围 0-size 就是映射整个字节的文件 ,不能超过1.5G
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length);
+        try {
+            LogHelper.logTag("Mmap随机写", "start", file, bytes);
+            long start = System.currentTimeMillis();
+            ByteBuffer subBuffer = mappedByteBuffer.slice();
+            subBuffer.position((int) currentPosition);
+            subBuffer.put(bytes);
+            long duration = System.currentTimeMillis() - start;
+            LogHelper.calDuration(start);
+            return duration;
+        } finally {
+            fileChannel.close();
+            clean(mappedByteBuffer);
+            LogHelper.logTag("Mmap随机写", "end", file, bytes);
         }
     }
 

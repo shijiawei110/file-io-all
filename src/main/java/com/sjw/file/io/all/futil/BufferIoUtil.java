@@ -17,17 +17,24 @@ public class BufferIoUtil implements FileStandardUtil {
     public static BufferIoUtil instance = new BufferIoUtil();
 
     @Override
-    public void sequenceWrite(File file, byte[] bytes) throws IOException {
+    public long sequenceWrite(File file, byte[] bytes) throws IOException {
         LogHelper.logTag("BufferStreamIo顺序写", "start", file, bytes);
         long start = System.currentTimeMillis();
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
         try {
             bos.write(bytes, 0, bytes.length);
             bos.flush();
+            long duration = System.currentTimeMillis() - start;
             LogHelper.calDuration(start);
+            return duration;
         } finally {
             bos.close();
             LogHelper.logTag("BufferStreamIo顺序写", "end", file, bytes);
         }
+    }
+
+    @Override
+    public long randomWrite(File file, byte[] bytes) throws IOException {
+        return 0;
     }
 }
