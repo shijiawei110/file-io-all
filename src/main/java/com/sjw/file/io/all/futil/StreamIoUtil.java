@@ -18,7 +18,7 @@ public class StreamIoUtil implements FileStandardUtil {
 
     @Override
     public long sequenceWrite(File file, byte[] bytes) throws IOException {
-        OutputStream output = new FileOutputStream(file);
+        OutputStream output = new FileOutputStream(file, true);
         try {
             LogHelper.logTag("StreamIo顺序写", "start", file, bytes);
             long start = System.currentTimeMillis();

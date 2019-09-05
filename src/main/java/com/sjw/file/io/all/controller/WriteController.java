@@ -23,13 +23,14 @@ import java.io.IOException;
 public class WriteController {
 
     private static final String SEQUENCE_WRITE = "seq-write";
+    private static final String RANDOM_WRITE = "random-write";
 
     /**
      * stream 顺序写
      */
     @GetMapping("/sequence/stream-io")
     public void sequenceStream(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
-        doWrite(size, num, StreamIoUtil.instance, 1, SEQUENCE_WRITE, true);
+        doWrite(size, num, StreamIoUtil.instance, 1, true);
     }
 
     /**
@@ -37,7 +38,7 @@ public class WriteController {
      */
     @GetMapping("/sequence/buffer-io")
     public void sequenceBuffer(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
-        doWrite(size, num, BufferIoUtil.instance, 2, SEQUENCE_WRITE, true);
+        doWrite(size, num, BufferIoUtil.instance, 2, true);
     }
 
     /**
@@ -45,7 +46,15 @@ public class WriteController {
      */
     @GetMapping("/sequence/filechannel")
     public void sequenceFilechannel(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
-        doWrite(size, num, FileChannelUtil.instance, 3, SEQUENCE_WRITE, true);
+        doWrite(size, num, FileChannelUtil.instance, 3, true);
+    }
+
+    /**
+     * filechannel 随机写
+     */
+    @GetMapping("/random/filechannel")
+    public void randomFilechannel(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+        doWrite(size, num, FileChannelUtil.instance, 3, false);
     }
 
     /**
@@ -53,11 +62,25 @@ public class WriteController {
      */
     @GetMapping("/sequence/mmap")
     public void sequenceMmap(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
-        doWrite(size, num, MmapUtil.instance, 4, SEQUENCE_WRITE, true);
+        doWrite(size, num, MmapUtil.instance, 4, true);
+    }
+
+    /**
+     * mmap 随机写
+     */
+    @GetMapping("/random/mmap")
+    public void randomMmap(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+        doWrite(size, num, MmapUtil.instance, 4, false);
     }
 
 
-    private void doWrite(int size, int num, FileStandardUtil fileStandardUtil, int type, String mode, boolean isSeq) throws IOException {
+    private void doWrite(int size, int num, FileStandardUtil fileStandardUtil, int type, boolean isSeq) throws IOException {
+        String mode = null;
+        if (isSeq) {
+            mode = SEQUENCE_WRITE;
+        } else {
+            mode = RANDOM_WRITE;
+        }
         File file = FileHelper.getFile(type, mode);
         long duration = 0;
         for (int i = 0; i < num; i++) {

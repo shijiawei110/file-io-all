@@ -30,8 +30,9 @@ public class MmapUtil implements FileStandardUtil {
         try {
             LogHelper.logTag("Mmap顺序写", "start", file, bytes);
             long start = System.currentTimeMillis();
-            //从当前 mmap 指针的位置写入数据
-            mappedByteBuffer.put(bytes);
+            ByteBuffer subBuffer = mappedByteBuffer.slice();
+            subBuffer.position((int) fileChannel.size());
+            subBuffer.put(bytes);
             //手动同步pageData刷盘
 //            mappedByteBuffer.force();
             long duration = System.currentTimeMillis() - start;
