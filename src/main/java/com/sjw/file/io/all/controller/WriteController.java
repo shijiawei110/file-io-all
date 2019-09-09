@@ -29,7 +29,7 @@ public class WriteController {
      * stream 顺序写
      */
     @GetMapping("/sequence/stream-io")
-    public void sequenceStream(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void sequenceStream(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, StreamIoUtil.instance, 1, true);
     }
 
@@ -37,7 +37,7 @@ public class WriteController {
      * buffer-io 顺序写
      */
     @GetMapping("/sequence/buffer-io")
-    public void sequenceBuffer(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void sequenceBuffer(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, BufferIoUtil.instance, 2, true);
     }
 
@@ -45,7 +45,7 @@ public class WriteController {
      * filechannel 顺序写
      */
     @GetMapping("/sequence/filechannel")
-    public void sequenceFilechannel(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void sequenceFilechannel(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, FileChannelUtil.instance, 3, true);
     }
 
@@ -53,7 +53,7 @@ public class WriteController {
      * filechannel 随机写
      */
     @GetMapping("/random/filechannel")
-    public void randomFilechannel(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void randomFilechannel(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, FileChannelUtil.instance, 3, false);
     }
 
@@ -61,7 +61,7 @@ public class WriteController {
      * mmap 顺序写
      */
     @GetMapping("/sequence/mmap")
-    public void sequenceMmap(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void sequenceMmap(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, MmapUtil.instance, 4, true);
     }
 
@@ -69,12 +69,12 @@ public class WriteController {
      * mmap 随机写
      */
     @GetMapping("/random/mmap")
-    public void randomMmap(@RequestParam("size") int size, @RequestParam("num") int num) throws IOException {
+    public void randomMmap(@RequestParam("size") String size, @RequestParam("num") int num) throws IOException {
         doWrite(size, num, MmapUtil.instance, 4, false);
     }
 
 
-    private void doWrite(int size, int num, FileStandardUtil fileStandardUtil, int type, boolean isSeq) throws IOException {
+    private void doWrite(String size, int num, FileStandardUtil fileStandardUtil, int type, boolean isSeq) throws IOException {
         String mode = null;
         if (isSeq) {
             mode = SEQUENCE_WRITE;
