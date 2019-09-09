@@ -19,6 +19,10 @@ public class LogHelper {
         log.info("总计耗时 duration = " + duration + " ms");
     }
 
+    public static void printDuration(long duration) {
+        log.info("总计耗时 duration = " + duration + " ms");
+    }
+
     public static void logTag(String type, String desc, File file, byte[] bytes) {
         long byteLength = bytes.length;
         String size = getHumanBytes(byteLength);

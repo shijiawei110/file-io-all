@@ -83,16 +83,15 @@ public class WriteController {
         }
         File file = FileHelper.getFile(type, mode);
         long duration = 0;
-        for (int i = 0; i < num; i++) {
-            byte[] bytes = TxtHelper.buildTxtByK(size);
-            if (isSeq) {
-                long time = fileStandardUtil.sequenceWrite(file, bytes);
-                duration += time;
-            } else {
-                long time = fileStandardUtil.randomWrite(file, bytes);
-                duration += time;
-            }
+        byte[] bytes = TxtHelper.buildTxtByK(size);
+        if (isSeq) {
+            long time = fileStandardUtil.sequenceWrite(file, bytes, num);
+            duration += time;
+        } else {
+            long time = fileStandardUtil.randomWrite(file, bytes, num);
+            duration += time;
         }
+
         log.info("do {} completed -> duration = {} ms", mode, duration);
 
     }

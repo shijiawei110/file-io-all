@@ -19,7 +19,7 @@ public class FileHelper {
     private static final String RANDOM_FALG = "raf.txt";
 
     public static File getFile(int type, String model) throws IOException {
-        return getFile(type, model);
+        return getFile(type, model, true);
     }
 
     public static File getFile(int type, String model, boolean isNeedNew) throws IOException {
