@@ -38,4 +38,9 @@ public class StreamIoUtil implements FileStandardUtil {
     public long randomWrite(File file, byte[] bytes, int writeNum) throws IOException {
         return 0;
     }
+
+    @Override
+    public long sequenceRead(File file, int onceKb) throws IOException {
+        return 0;
+    }
 }

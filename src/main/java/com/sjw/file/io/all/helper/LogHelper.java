@@ -23,10 +23,18 @@ public class LogHelper {
         log.info("总计耗时 duration = " + duration + " ms");
     }
 
+    public static void printReadInfo(String str) {
+        log.info("读出文本信息完毕 -> size = {}", str.length());
+    }
+
     public static void logTag(String type, String desc, File file, byte[] bytes) {
-        long byteLength = bytes.length;
-        String size = getHumanBytes(byteLength);
-        log.info("执行{}文件 【{}】 -> filePath = {} , txtSize = {}", type, desc, file.getPath(), size);
+        if (null == bytes) {
+            log.info("执行{}文件 【{}】 -> filePath = {}", type, desc, file.getPath());
+        } else {
+            long byteLength = bytes.length;
+            String size = getHumanBytes(byteLength);
+            log.info("执行{}文件 【{}】 -> filePath = {} , txtSize = {}", type, desc, file.getPath(), size);
+        }
     }
 
     public static String getHumanBytes(long size) {

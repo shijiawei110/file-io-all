@@ -72,8 +72,46 @@ public class MmapUtil implements FileStandardUtil {
         }
     }
 
+    @Override
+    public long sequenceRead(File file, int onceKb) throws IOException {
+        FileChannel fileChannel = getChannel(file);
+        long fileSize = file.length();
+        //范围 0-size 就是映射整个字节的文件 ,不能超过1.5G
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileSize);
+        LogHelper.logTag("Mmap顺序读", "start", file, null);
+        ByteBuffer subBuffer = mappedByteBuffer.slice();
+        long start = System.currentTimeMillis();
+        try {
+            byte[] bt = new byte[(int) fileSize];
+            mappedByteBuffer.get(bt);
+            String str = new String(bt);
+            LogHelper.printReadInfo(str);
+            long duration = System.currentTimeMillis() - start;
+            LogHelper.printDuration(duration);
+            return duration;
+        } finally {
+            fileChannel.close();
+            ByteBufHelper.mmpClean(mappedByteBuffer);
+            LogHelper.logTag("Mmap顺序读", "end", file, null);
+        }
+    }
 
     private FileChannel getChannel(File file) throws IOException {
         return new RandomAccessFile(file, "rw").getChannel();
+    }
+
+    public static void main(String[] args) throws IOException {
+        File file = new File("/Users/shijiawei/Desktop/io-test.txt");
+        long fileSize = file.length();
+        System.out.println("file size = " + fileSize);
+        FileChannel fileChannel = new RandomAccessFile(file, "rw").getChannel();
+        //范围 0-size 就是映射整个字节的文件 ,不能超过1.5G
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, fileSize);
+        byte[] bt = new byte[(int) fileSize];
+        mappedByteBuffer.get(bt);
+        String str = new String(bt);
+        System.out.println(str);
+        fileChannel.close();
+        ByteBufHelper.mmpClean(mappedByteBuffer);
     }
 }

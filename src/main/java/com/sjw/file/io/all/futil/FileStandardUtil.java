@@ -14,10 +14,15 @@ public interface FileStandardUtil {
     /**
      * 顺序写
      */
-    long sequenceWrite(File file, byte[] bytes,int writeNum) throws IOException;
+    long sequenceWrite(File file, byte[] bytes, int writeNum) throws IOException;
 
     /**
      * 随机写
      */
-    long randomWrite(File file, byte[] bytes,int writeNum) throws IOException;
+    long randomWrite(File file, byte[] bytes, int writeNum) throws IOException;
+
+    /**
+     * 顺序读
+     */
+    long sequenceRead(File file, int onceKb) throws IOException;
 }
