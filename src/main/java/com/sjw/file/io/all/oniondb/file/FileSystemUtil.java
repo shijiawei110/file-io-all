@@ -14,7 +14,7 @@ public class FileSystemUtil {
     public static FileSystemUtil instance = new FileSystemUtil();
 
 
-    private final FileStandardUtil FILE_STANDARD_UTIL = FileChannelUtil.instance;
+    private final FileChannelImpl FILE_STANDARD_UTIL = FileChannelImpl.instance;
 
 
     //todo  写需要加锁

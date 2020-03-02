@@ -50,11 +50,15 @@ public class SjwTest {
         buffer.putInt(v);
         buffer.putString(vl, charsetEncoder);
 
-        buffer.flip();
-        System.out.println(buffer.get());
+//        buffer.flip();
+
+//        int kkk = buffer.get();
+//        System.out.println(kkk);
 //        System.out.println(buffer.getString(5, charsetDecoder));
 //        System.out.println(buffer.getInt());
 //        System.out.println(buffer.getString(10, charsetDecoder));
+        byte[] kk = buffer.array();
+        System.out.println(new String(kk));
 
     }
 }
