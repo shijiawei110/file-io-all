@@ -19,7 +19,8 @@ public class NodeSerializeHelper {
     }
 
     public static byte[] serializeBytes(String key, String value) {
-        return null;
+        ByteBuffer byteBuffer = buildByteBuffer(key, value);
+        return byteBuffer.array();
     }
 
     private static ByteBuffer buildByteBuffer(String key, String value) {

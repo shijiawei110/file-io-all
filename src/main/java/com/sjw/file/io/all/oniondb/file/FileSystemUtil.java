@@ -16,7 +16,6 @@ public class FileSystemUtil {
 
     private final FileChannelImpl FILE_STANDARD_UTIL = FileChannelImpl.instance;
 
-
     //todo  写需要加锁
     public synchronized void write(byte[] bytes) {
         if (bytes.length <= 0) {
