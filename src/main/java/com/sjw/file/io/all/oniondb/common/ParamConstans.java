@@ -18,8 +18,18 @@ public class ParamConstans {
     public static final int KEY_FALG_BYTE_NUM = 1;
 
     /**
+     * key最大长度
+     */
+    public static final int KEY_MAX_SIZE = Byte.MAX_VALUE;
+
+    /**
      * value长度的占位符的字节数 -> 4字节int
      */
     public static final int VALUE_FALG_BYTE_NUM = 4;
+
+    /**
+     * value最大长度
+     */
+    public static final int VALUE_MAX_SIZE = Integer.MAX_VALUE;
 
 }

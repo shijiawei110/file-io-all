@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 public class OnionDbException extends RuntimeException {
 
     public static final OnionDbException REQUEST_PARAM_ERROR= new OnionDbException(10001, "入参信息错误");
+    public static final OnionDbException OUT_OF_MAX_LENGTH= new OnionDbException(10002, "超过最大存储长度");
 
 
     /**
