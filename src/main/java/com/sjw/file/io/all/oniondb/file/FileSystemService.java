@@ -2,6 +2,10 @@ package com.sjw.file.io.all.oniondb.file;
 
 import com.sjw.file.io.all.futil.FileChannelUtil;
 import com.sjw.file.io.all.futil.FileStandardUtil;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author shijiawei
@@ -9,12 +13,13 @@ import com.sjw.file.io.all.futil.FileStandardUtil;
  * @date 2020/2/28
  * 文件系统工具
  */
-public class FileSystemUtil {
+@Service
+public class FileSystemService {
 
-    public static FileSystemUtil instance = new FileSystemUtil();
 
+    @Resource
+    private FileChannelImpl fileChannel;
 
-    private final FileChannelImpl FILE_STANDARD_UTIL = FileChannelImpl.instance;
 
     //todo  写需要加锁
     public synchronized void write(byte[] bytes) {

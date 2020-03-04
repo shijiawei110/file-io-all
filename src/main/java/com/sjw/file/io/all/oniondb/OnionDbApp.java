@@ -1,10 +1,15 @@
 package com.sjw.file.io.all.oniondb;
 
+import com.sjw.file.io.all.oniondb.common.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * @author shijiawei
@@ -13,7 +18,10 @@ import org.apache.commons.lang3.StringUtils;
  * 洋葱db的接口主类
  */
 @Slf4j
+@Component
 public class OnionDbApp {
+
+    private MemoryCacheTable memoryCacheTable;
 
     public OnionDbResult set(String key, Object value) {
         try {
@@ -23,6 +31,15 @@ public class OnionDbApp {
             String vStr = value.toString();
             //检查字段，是否超过最大的key的size或者value的size
             checkMaxLimit(key, vStr);
+            //memoryTable put
+            MemoryCachePutResult memoryCachePutResult = memoryCacheTable.put(key, vStr);
+            if (memoryCachePutResult.isFull()) {
+                //执行数据入磁盘
+                Map<String, String> data = memoryCachePutResult.getFullData();
+            } else {
+                return OnionDbResult.successResult(memoryCachePutResult.getSetNum());
+            }
+
         } catch (OnionDbException e) {
             return OnionDbResult.failResult(e);
         } catch (Exception e) {
@@ -47,4 +64,8 @@ public class OnionDbApp {
         }
     }
 
+    @Autowired
+    public void setMemoryCacheTable(MemoryCacheTable memoryCacheTable) {
+        this.memoryCacheTable = memoryCacheTable;
+    }
 }

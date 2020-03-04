@@ -1,6 +1,7 @@
 package com.sjw.file.io.all.oniondb.file;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.File;
@@ -16,9 +17,8 @@ import java.nio.channels.FileChannel;
  * filechannel util工具
  */
 @Slf4j
+@Component
 public class FileChannelImpl implements FileStandardApi {
-
-    public static FileChannelImpl instance = new FileChannelImpl();
 
     @Override
     public void sequenceWrite(File file, ByteBuffer byteBuffer) throws IOException {
