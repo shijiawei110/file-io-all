@@ -1,9 +1,12 @@
 package com.sjw.file.io.all.oniondb.helper;
 
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
+import com.sjw.file.io.all.oniondb.exception.OnionDbException;
+import org.apache.commons.collections.MapUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author shijiawei
@@ -14,27 +17,35 @@ import java.nio.charset.StandardCharsets;
  */
 public class NodeSerializeHelper {
 
-    public static ByteBuffer serializeByteBuffer(String key, String value) {
-        return buildByteBuffer(key, value);
+    public static ByteBuffer serializeByteBuffer(Map<String, String> map, int size) {
+        if (MapUtils.isEmpty(map)) {
+            throw OnionDbException.DATA_NULL_ERROR;
+        }
+        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+        map.forEach((k, v) -> {
+            buildByteBuffer(byteBuffer, k, v);
+        });
+        byteBuffer.flip();
+        return byteBuffer;
     }
 
-    public static byte[] serializeBytes(String key, String value) {
-        ByteBuffer byteBuffer = buildByteBuffer(key, value);
-        return byteBuffer.array();
+    /**
+     * 计算单个节点的协议化字节数
+     */
+    public static int calNodeSize(String key, String value) {
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
+        return keyBytes.length + valueBytes.length + ParamConstans.KEY_FALG_BYTE_NUM + ParamConstans.VALUE_FALG_BYTE_NUM;
     }
 
-    private static ByteBuffer buildByteBuffer(String key, String value) {
+    private static void buildByteBuffer(ByteBuffer byteBuffer, String key, String value) {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
         byte keySize = (byte) keyBytes.length;
         int valueSize = valueBytes.length;
-        int size = keyBytes.length + valueBytes.length + ParamConstans.KEY_FALG_BYTE_NUM + ParamConstans.VALUE_FALG_BYTE_NUM;
-        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
         byteBuffer.put(keySize);
         byteBuffer.put(keyBytes);
         byteBuffer.putInt(valueSize);
         byteBuffer.put(valueBytes);
-        byteBuffer.flip();
-        return byteBuffer;
     }
 }

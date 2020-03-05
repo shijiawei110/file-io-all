@@ -4,12 +4,15 @@ import com.sjw.file.io.all.oniondb.common.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
+import com.sjw.file.io.all.oniondb.file.FileSystemService;
+import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.nio.ByteBuffer;
 
 /**
  * @author shijiawei
@@ -23,6 +26,8 @@ public class OnionDbApp {
 
     private MemoryCacheTable memoryCacheTable;
 
+    private FileSystemService fileSystemService;
+
     public OnionDbResult set(String key, Object value) {
         try {
             //基础check -> null等
@@ -34,13 +39,15 @@ public class OnionDbApp {
             //memoryTable put
             MemoryCachePutResult memoryCachePutResult = memoryCacheTable.put(key, vStr);
             if (memoryCachePutResult.isFull()) {
+                //协议序列化
+                ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
                 //执行数据入磁盘
-                Map<String, String> data = memoryCachePutResult.getFullData();
+                fileSystemService.write(byteBuffer);
             } else {
                 return OnionDbResult.successResult(memoryCachePutResult.getSetNum());
             }
-
         } catch (OnionDbException e) {
+            log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
             return OnionDbResult.failResult(e);
         } catch (Exception e) {
             log.error("onion db system error", e);
@@ -48,6 +55,7 @@ public class OnionDbApp {
         }
         return null;
     }
+
 
     private void checkRequestParams(String key, Object value) {
         if (StringUtils.isBlank(key) || null == value) {
@@ -67,5 +75,10 @@ public class OnionDbApp {
     @Autowired
     public void setMemoryCacheTable(MemoryCacheTable memoryCacheTable) {
         this.memoryCacheTable = memoryCacheTable;
+    }
+
+    @Autowired
+    public FileSystemService getFileSystemService() {
+        return fileSystemService;
     }
 }

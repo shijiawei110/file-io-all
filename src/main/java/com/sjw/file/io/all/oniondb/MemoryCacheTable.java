@@ -3,7 +3,7 @@ package com.sjw.file.io.all.oniondb;
 import com.google.common.collect.Maps;
 import com.sjw.file.io.all.oniondb.common.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
-import org.apache.commons.lang3.StringUtils;
+import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -39,8 +39,7 @@ public class MemoryCacheTable {
             //检测是否full
             if (isFull()) {
                 //reset and get map
-                Map<String, String> map = reset();
-                return MemoryCachePutResult.successAndFull(1, map);
+                return reset();
             } else {
                 return MemoryCachePutResult.success(1);
             }
@@ -59,11 +58,18 @@ public class MemoryCacheTable {
     /**
      * 重置内存树
      */
-    public Map<String, String> reset() {
+    private MemoryCachePutResult reset() {
         Map<String, String> map = Maps.newHashMap();
-        tree.forEach(map::put);
+        int dataSize = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            int size = NodeSerializeHelper.calNodeSize(k, v);
+            map.put(k, v);
+            dataSize += size;
+        }
         clear();
-        return map;
+        return MemoryCachePutResult.successAndFull(1, map, dataSize);
     }
 
     private void clear() {

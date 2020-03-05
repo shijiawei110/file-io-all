@@ -1,11 +1,13 @@
 package com.sjw.file.io.all.oniondb.file;
 
-import com.sjw.file.io.all.futil.FileChannelUtil;
-import com.sjw.file.io.all.futil.FileStandardUtil;
-import org.springframework.stereotype.Component;
+import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shijiawei
@@ -20,11 +22,14 @@ public class FileSystemService {
     @Resource
     private FileChannelImpl fileChannel;
 
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    //todo  写需要加锁
-    public synchronized void write(byte[] bytes) {
-        if (bytes.length <= 0) {
-            return;
+    public void write(ByteBuffer byteBuffer) throws IOException {
+        try {
+            lock.writeLock().lock();
+            fileChannel.sequenceWrite(FileHelper.getWriteFile(), byteBuffer);
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 

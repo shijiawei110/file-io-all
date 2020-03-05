@@ -23,33 +23,38 @@ public class MemoryCachePutResult {
      * 内存表满后的全量搬迁数据
      */
     private Map<String, String> fullData;
+    /**
+     * 数据size
+     */
+    private int fullDataSize;
 
     //预留字段 -> 墓碑table todo
 
     public static MemoryCachePutResult success(int setNum) {
-        return new MemoryCachePutResult(true, setNum, false, null);
+        return new MemoryCachePutResult(true, setNum, false, null, 0);
     }
 
-    public static MemoryCachePutResult successAndFull(int setNum, Map<String, String> data) {
-        return new MemoryCachePutResult(true, setNum, true, data);
+    public static MemoryCachePutResult successAndFull(int setNum, Map<String, String> data, int fullDataSize) {
+        return new MemoryCachePutResult(true, setNum, true, data, fullDataSize);
     }
 
     public static MemoryCachePutResult fail(int setNum) {
-        return new MemoryCachePutResult(false, setNum, false, null);
+        return new MemoryCachePutResult(false, setNum, false, null, 0);
     }
 
-    public static MemoryCachePutResult failAndFull(int setNum, Map<String, String> data) {
-        return new MemoryCachePutResult(false, setNum, true, data);
+    public static MemoryCachePutResult failAndFull(int setNum, Map<String, String> data, int fullDataSize) {
+        return new MemoryCachePutResult(false, setNum, true, data, fullDataSize);
     }
 
-    private MemoryCachePutResult(boolean success, int setNum, boolean isFull, Map<String, String> fullData) {
+    private MemoryCachePutResult(boolean success, int setNum, boolean isFull, Map<String, String> fullData, int fullDataSize) {
         this.success = success;
         this.setNum = setNum;
         this.isFull = isFull;
         this.fullData = fullData;
+        this.fullDataSize = fullDataSize;
     }
 
-    public boolean isFull(){
+    public boolean isFull() {
         return isFull;
     }
 }
