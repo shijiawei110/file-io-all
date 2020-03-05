@@ -43,9 +43,8 @@ public class OnionDbApp {
                 ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
                 //执行数据入磁盘
                 fileSystemService.write(byteBuffer);
-            } else {
-                return OnionDbResult.successResult(memoryCachePutResult.getSetNum());
             }
+            return OnionDbResult.successResult(memoryCachePutResult.getSetNum());
         } catch (OnionDbException e) {
             log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
             return OnionDbResult.failResult(e);
@@ -53,7 +52,6 @@ public class OnionDbApp {
             log.error("onion db system error", e);
             return OnionDbResult.failSystemResult(e.getMessage());
         }
-        return null;
     }
 
 
@@ -73,12 +71,12 @@ public class OnionDbApp {
     }
 
     @Autowired
-    public void setMemoryCacheTable(MemoryCacheTable memoryCacheTable) {
+    private void setMemoryCacheTable(MemoryCacheTable memoryCacheTable) {
         this.memoryCacheTable = memoryCacheTable;
     }
 
     @Autowired
-    public FileSystemService getFileSystemService() {
+    private FileSystemService getFileSystemService() {
         return fileSystemService;
     }
 }
