@@ -1,7 +1,6 @@
-package com.sjw.file.io.all.oniondb;
+package com.sjw.file.io.all.oniondb.memory;
 
 import com.google.common.collect.Maps;
-import com.sjw.file.io.all.oniondb.common.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,7 @@ public class MemoryCacheTable {
     /**
      * 单个put
      */
-    MemoryCachePutResult put(String k, String v) {
+    public MemoryCachePutResult put(String k, String v) {
         try {
             lock.writeLock().lock();
             tree.put(k, v);
@@ -48,6 +47,15 @@ public class MemoryCacheTable {
         }
     }
 
+    public Object get(String key) {
+        try {
+            lock.readLock().lock();
+            return tree.get(key);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     /**
      * 是否超过最大节点个数
      */
@@ -59,17 +67,20 @@ public class MemoryCacheTable {
      * 重置内存树
      */
     private MemoryCachePutResult reset() {
-        Map<String, String> map = Maps.newHashMap();
+        Map<String, String> dataMap = Maps.newHashMap();
         int dataSize = 0;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        Map<String, Integer> indexData = Maps.newHashMap();
+        //提前计算总size和offset方便后面放内存索引
+        for (Map.Entry<String, String> entry : tree.entrySet()) {
             String k = entry.getKey();
             String v = entry.getValue();
             int size = NodeSerializeHelper.calNodeSize(k, v);
-            map.put(k, v);
+            dataMap.put(k, v);
+            indexData.put(k, dataSize);
             dataSize += size;
         }
         clear();
-        return MemoryCachePutResult.successAndFull(1, map, dataSize);
+        return MemoryCachePutResult.successAndFull(1, dataMap, dataSize, indexData);
     }
 
     private void clear() {

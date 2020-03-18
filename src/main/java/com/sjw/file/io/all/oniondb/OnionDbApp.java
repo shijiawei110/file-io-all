@@ -1,11 +1,12 @@
 package com.sjw.file.io.all.oniondb;
 
-import com.sjw.file.io.all.oniondb.common.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.file.FileSystemService;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
+import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
+import com.sjw.file.io.all.oniondb.memory.MemoryCacheTable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -28,10 +29,11 @@ public class OnionDbApp {
 
     private FileSystemService fileSystemService;
 
-    public OnionDbResult set(String key, Object value) {
+    public OnionDbResult set(String key, String value) {
         try {
             //基础check -> null等
-            checkRequestParams(key, value);
+            checkParams(key, value);
+            log.info("onion db set action -> key = {} | value = {}", key, value);
             //value 序列化选择，默认直接String，其他可以用protostuff等替换
             String vStr = value.toString();
             //检查字段，是否超过最大的key的size或者value的size
@@ -39,10 +41,9 @@ public class OnionDbApp {
             //memoryTable put
             MemoryCachePutResult memoryCachePutResult = memoryCacheTable.put(key, vStr);
             if (memoryCachePutResult.isFull()) {
-                //协议序列化
-                ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
-                //执行数据入磁盘
-                fileSystemService.write(byteBuffer);
+                log.info("onion db memory table full -> size = {}", ParamConstans.MAX_NODE_SIZE);
+                //执行数据入盘
+                fileSystemService.write(memoryCachePutResult);
             }
             return OnionDbResult.successResult(memoryCachePutResult.getSetNum());
         } catch (OnionDbException e) {
@@ -54,10 +55,32 @@ public class OnionDbApp {
         }
     }
 
+    public OnionDbResult get(String key) {
+        try {
+            checkParams(key);
+            checkKeyMaxLimit(key);
+            //首先查memory table
+            Object memResult = memoryCacheTable.get(key);
+            if (null != memResult) {
+                return OnionDbResult.successResult(memResult);
+            }
 
-    private void checkRequestParams(String key, Object value) {
-        if (StringUtils.isBlank(key) || null == value) {
-            throw OnionDbException.REQUEST_PARAM_ERROR;
+
+        } catch (OnionDbException e) {
+            log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
+            return OnionDbResult.failResult(e);
+        } catch (Exception e) {
+            log.error("onion db system error", e);
+            return OnionDbResult.failSystemResult(e.getMessage());
+        }
+    }
+
+
+    private void checkParams(String... params) {
+        for (String str : params) {
+            if (StringUtils.isBlank(str)) {
+                throw OnionDbException.REQUEST_PARAM_ERROR;
+            }
         }
     }
 
@@ -70,13 +93,20 @@ public class OnionDbApp {
         }
     }
 
+    private void checkKeyMaxLimit(String key) {
+        if (key.length() >= ParamConstans.KEY_MAX_SIZE) {
+            throw OnionDbException.OUT_OF_MAX_LENGTH;
+        }
+    }
+
     @Autowired
     private void setMemoryCacheTable(MemoryCacheTable memoryCacheTable) {
         this.memoryCacheTable = memoryCacheTable;
     }
 
     @Autowired
-    private FileSystemService getFileSystemService() {
-        return fileSystemService;
+    public void setFileSystemService(FileSystemService fileSystemService) {
+        this.fileSystemService = fileSystemService;
     }
+
 }

@@ -9,10 +9,14 @@ import java.io.File;
  */
 public class FileHelper {
 
+    private static final String FILE_FORM = ".odb";
+
+    private static final String FILE_FILE_NAME = "/onionDbTables";
+
     public static File getWriteFile() {
-        String path = getUserPath() + "/onionDbTables";
+        String path = getUserPath() + FILE_FILE_NAME;
         checkPath(path);
-        String fileName = path + "/onion_db_table_test.odb";
+        String fileName = path + "/onion_db_table_test" + FILE_FORM;
         return new File(fileName);
     }
 
@@ -20,7 +24,7 @@ public class FileHelper {
         return System.getProperty("user.dir");
     }
 
-    private static void checkPath(String path){
+    private static void checkPath(String path) {
         File pathFile = new File(path);
         if (!pathFile.exists()) {
             pathFile.mkdir();

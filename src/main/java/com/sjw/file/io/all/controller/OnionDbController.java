@@ -24,8 +24,12 @@ public class OnionDbController {
     private OnionDbApp onionDbApp;
 
     @GetMapping("/write/set")
-    public OnionDbResult set(@RequestParam("key") String key, @RequestParam("value") Object value) {
-        log.info("onion db set action -> key = {} | value = {}", key, value);
+    public OnionDbResult set(@RequestParam("key") String key, @RequestParam("value") String value) {
         return onionDbApp.set(key, value);
+    }
+
+    @GetMapping("/write/test")
+    public OnionDbResult testSet() {
+        return null;
     }
 }

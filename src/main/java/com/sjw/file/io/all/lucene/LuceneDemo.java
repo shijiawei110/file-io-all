@@ -38,7 +38,7 @@ public class LuceneDemo {
     private FSDirectory directory;
 
 
-    @PostConstruct
+//    @PostConstruct
     private void init() throws IOException {
         // 中文分词分析器
         HanLPAnalyzer analyser = new HanLPAnalyzer();

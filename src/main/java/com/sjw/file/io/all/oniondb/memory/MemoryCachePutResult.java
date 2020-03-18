@@ -1,4 +1,4 @@
-package com.sjw.file.io.all.oniondb.common;
+package com.sjw.file.io.all.oniondb.memory;
 
 import lombok.Data;
 
@@ -28,30 +28,28 @@ public class MemoryCachePutResult {
      */
     private int fullDataSize;
 
+    /**
+     * 索引数据
+     */
+    private Map<String, Integer> indexData;
+
     //预留字段 -> 墓碑table todo
 
     public static MemoryCachePutResult success(int setNum) {
-        return new MemoryCachePutResult(true, setNum, false, null, 0);
+        return new MemoryCachePutResult(true, setNum, false, null, 0, null);
     }
 
-    public static MemoryCachePutResult successAndFull(int setNum, Map<String, String> data, int fullDataSize) {
-        return new MemoryCachePutResult(true, setNum, true, data, fullDataSize);
+    public static MemoryCachePutResult successAndFull(int setNum, Map<String, String> data, int fullDataSize, Map<String, Integer> indexData) {
+        return new MemoryCachePutResult(true, setNum, true, data, fullDataSize, indexData);
     }
 
-    public static MemoryCachePutResult fail(int setNum) {
-        return new MemoryCachePutResult(false, setNum, false, null, 0);
-    }
-
-    public static MemoryCachePutResult failAndFull(int setNum, Map<String, String> data, int fullDataSize) {
-        return new MemoryCachePutResult(false, setNum, true, data, fullDataSize);
-    }
-
-    private MemoryCachePutResult(boolean success, int setNum, boolean isFull, Map<String, String> fullData, int fullDataSize) {
+    private MemoryCachePutResult(boolean success, int setNum, boolean isFull, Map<String, String> fullData, int fullDataSize, Map<String, Integer> indexData) {
         this.success = success;
         this.setNum = setNum;
         this.isFull = isFull;
         this.fullData = fullData;
         this.fullDataSize = fullDataSize;
+        this.indexData = indexData;
     }
 
     public boolean isFull() {
