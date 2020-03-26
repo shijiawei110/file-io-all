@@ -26,4 +26,8 @@ public class DenseIndex implements OnionDbTableIndex {
     public void setIndex(Map<String, Integer> map) {
         indexMap = map;
     }
+
+    public Integer getIndex(String key) {
+        return indexMap.get(key);
+    }
 }

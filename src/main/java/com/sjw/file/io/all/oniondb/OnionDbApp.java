@@ -4,7 +4,6 @@ import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.file.FileSystemService;
-import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.memory.MemoryCacheTable;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author shijiawei
@@ -60,12 +57,13 @@ public class OnionDbApp {
             checkParams(key);
             checkKeyMaxLimit(key);
             //首先查memory table
-            Object memResult = memoryCacheTable.get(key);
+            String memResult = memoryCacheTable.get(key);
             if (null != memResult) {
                 return OnionDbResult.successResult(memResult);
             }
-
-
+            //查磁盘
+            String dbResult = fileSystemService.get(key);
+            return OnionDbResult.successResult(dbResult);
         } catch (OnionDbException e) {
             log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
             return OnionDbResult.failResult(e);
@@ -73,6 +71,7 @@ public class OnionDbApp {
             log.error("onion db system error", e);
             return OnionDbResult.failSystemResult(e.getMessage());
         }
+
     }
 
 

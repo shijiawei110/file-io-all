@@ -47,7 +47,7 @@ public class MemoryCacheTable {
         }
     }
 
-    public Object get(String key) {
+    public String get(String key) {
         try {
             lock.readLock().lock();
             return tree.get(key);

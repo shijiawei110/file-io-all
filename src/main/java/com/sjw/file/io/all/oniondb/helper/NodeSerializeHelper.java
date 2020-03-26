@@ -2,6 +2,7 @@ package com.sjw.file.io.all.oniondb.helper;
 
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
+import com.sjw.file.io.all.oniondb.utils.ByteUtils;
 import org.apache.commons.collections.MapUtils;
 
 import java.nio.ByteBuffer;
@@ -41,7 +42,7 @@ public class NodeSerializeHelper {
     private static void buildByteBuffer(ByteBuffer byteBuffer, String key, String value) {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
-        byte keySize = (byte) keyBytes.length;
+        byte keySize = ByteUtils.intToByte(keyBytes.length);
         int valueSize = valueBytes.length;
         byteBuffer.put(keySize);
         byteBuffer.put(keyBytes);

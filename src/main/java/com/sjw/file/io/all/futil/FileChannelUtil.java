@@ -5,7 +5,6 @@ import com.sjw.file.io.all.helper.LogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -118,6 +117,10 @@ public class FileChannelUtil implements FileStandardUtil {
     }
 
     public static void main(String[] args) throws IOException {
+        randomReadTest();
+    }
+
+    private static void seqReadTest() throws IOException {
         File file = new File("/Users/shijiawei/Desktop/io-test.txt");
         FileChannel fileChannel = new RandomAccessFile(file, "rw").getChannel();
         ByteBuffer buffer = ByteBuffer.allocate(16);
@@ -137,6 +140,19 @@ public class FileChannelUtil implements FileStandardUtil {
             buffer.compact();
         }
         System.out.println(sb.toString());
+        fileChannel.close();
+    }
+
+    private static void randomReadTest() throws IOException {
+        File file = new File("/Users/shijiawei/Desktop/io-test.txt");
+        FileChannel fileChannel = new RandomAccessFile(file, "rw").getChannel();
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        fileChannel.read(buffer, 2);
+        //切换到读模式
+        buffer.flip();
+        Charset charset = StandardCharsets.UTF_8;
+        String str = charset.decode(buffer).toString();
+        System.out.println(str);
         fileChannel.close();
     }
 

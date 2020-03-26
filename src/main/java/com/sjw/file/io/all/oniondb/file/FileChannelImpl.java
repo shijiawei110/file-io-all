@@ -48,8 +48,19 @@ public class FileChannelImpl implements FileStandardApi {
     }
 
     @Override
-    public long randomRead(File file) throws IOException {
-        return 0;
+    public byte[] randomRead(File file, int offset, int readByteNum) throws IOException {
+        FileChannel fileChannel = getChannel(file);
+        byte[] result = new byte[readByteNum];
+        try {
+            ByteBuffer buffer = ByteBuffer.allocate(readByteNum);
+            fileChannel.read(buffer, offset);
+            //切换到读模式
+            buffer.flip();
+            buffer.get(result);
+        } finally {
+            fileChannel.close();
+        }
+        return result;
     }
 
     private FileChannel getChannel(File file) throws IOException {

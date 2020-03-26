@@ -20,6 +20,12 @@ public class FileHelper {
         return new File(fileName);
     }
 
+    public static File getReadFile() {
+        String path = getUserPath() + FILE_FILE_NAME;
+        String fileName = path + "/onion_db_table_test" + FILE_FORM;
+        return new File(fileName);
+    }
+
     private static String getUserPath() {
         return System.getProperty("user.dir");
     }

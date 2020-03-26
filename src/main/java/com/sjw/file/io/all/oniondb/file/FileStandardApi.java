@@ -30,5 +30,5 @@ public interface FileStandardApi {
     /**
      * 随机读
      */
-    long randomRead(File file) throws IOException;
+    byte[] randomRead(File file, int offset, int readByteNum) throws IOException;
 }
