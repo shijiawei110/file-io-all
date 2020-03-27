@@ -3,6 +3,7 @@ package com.sjw.file.io.all.oniondb.memory;
 import com.google.common.collect.Maps;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 前置内存表，用完内存表之后才会存入磁盘表
  */
 @Component
+@Slf4j
 public class MemoryCacheTable {
 
     private TreeMap<String, String> tree = Maps.newTreeMap();
@@ -38,6 +40,7 @@ public class MemoryCacheTable {
             //检测是否full
             if (isFull()) {
                 //reset and get map
+                log.info("memory tree is full do reset -> key = {} value = {}", k, v);
                 return reset();
             } else {
                 return MemoryCachePutResult.success(1);

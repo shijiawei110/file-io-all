@@ -10,7 +10,7 @@ public class ParamConstans {
     /**
      * 内存表最大的节点个数
      **/
-    public static final int MAX_NODE_SIZE = 1000;
+    public static final int MAX_NODE_SIZE = 5;
 
     /**
      * key长度的占位符的字节数
