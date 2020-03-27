@@ -28,6 +28,11 @@ public class OnionDbController {
         return onionDbApp.set(key, value);
     }
 
+    @GetMapping("/write/get")
+    public OnionDbResult set(@RequestParam("key") String key) {
+        return onionDbApp.get(key);
+    }
+
     @GetMapping("/write/test")
     public OnionDbResult testSet() {
         return null;
