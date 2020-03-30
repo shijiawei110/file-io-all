@@ -40,7 +40,6 @@ public class MemoryCacheTable {
             //检测是否full
             if (isFull()) {
                 //reset and get map
-                log.info("memory tree is full do reset -> key = {} value = {}", k, v);
                 return reset();
             } else {
                 return MemoryCachePutResult.success(1);

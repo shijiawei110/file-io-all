@@ -2,13 +2,16 @@ package com.sjw.file.io.all.controller;
 
 import com.sjw.file.io.all.oniondb.OnionDbApp;
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
+import com.sjw.file.io.all.oniondb.request.BatchSetRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author shijiawei
@@ -25,6 +28,11 @@ public class OnionDbController {
 
     @GetMapping("/write/set")
     public OnionDbResult set(@RequestParam("key") String key, @RequestParam("value") String value) {
+        return onionDbApp.set(key, value);
+    }
+
+    @GetMapping("/batch/set")
+    public OnionDbResult batchSet(@RequestBody List<BatchSetRequest> requests) {
         return onionDbApp.set(key, value);
     }
 

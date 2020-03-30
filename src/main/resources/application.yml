@@ -1,9 +1,9 @@
 server:
-  port: 80
+  port: 10086
 
 spring:
   profiles:
-    active: dev
+    active: prod
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
