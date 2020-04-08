@@ -69,9 +69,9 @@ public class MemoryCacheTable {
      * 重置内存树
      */
     private MemoryCachePutResult reset() {
-        Map<String, String> dataMap = Maps.newHashMap();
+        Map<String, String> dataMap = Maps.newLinkedHashMap();
+        Map<String, Integer> indexData = Maps.newLinkedHashMap();
         int dataSize = 0;
-        Map<String, Integer> indexData = Maps.newHashMap();
         //提前计算总size和offset方便后面放内存索引
         for (Map.Entry<String, String> entry : tree.entrySet()) {
             String k = entry.getKey();
