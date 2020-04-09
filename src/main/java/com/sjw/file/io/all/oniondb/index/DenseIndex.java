@@ -13,7 +13,6 @@ import java.util.Map;
  * 密集索引 ：每个kv都创建内存索引
  */
 @Slf4j
-@Component
 public class DenseIndex implements OnionDbTableIndex {
 
     private Map<String, Integer> indexMap = Maps.newHashMap();
@@ -23,10 +22,11 @@ public class DenseIndex implements OnionDbTableIndex {
         indexMap.put(key, offset);
     }
 
-    public void setIndex(Map<String, Integer> map) {
+    @Override
+    public void setIndexMap(Map<String, Integer> map) {
         indexMap = map;
     }
-
+    @Override
     public Integer getIndex(String key) {
         return indexMap.get(key);
     }

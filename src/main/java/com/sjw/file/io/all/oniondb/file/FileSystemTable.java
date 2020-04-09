@@ -5,13 +5,12 @@ import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import com.sjw.file.io.all.oniondb.index.DenseIndex;
+import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.pojo.DbNodePojo;
 import com.sjw.file.io.all.oniondb.utils.ByteUtils;
 import com.sjw.file.io.all.oniondb.utils.NumberUtil;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,21 +18,26 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shijiawei
- * @version FileSystemUtil.java -> v 1.0
+ * @version FileSystemTable.java -> v 1.0
  * @date 2020/2/28
- * 文件系统工具
+ * 对应文件系统表
  */
-@Service
-public class FileSystemService {
+public class FileSystemTable {
 
+    private static final FileChannelImpl fileChannel = FileChannelImpl.getInstance();
 
-    @Resource
-    private FileChannelImpl fileChannel;
+    //该实例持有的索引实例
+    private OnionDbTableIndex denseIndex;
 
-    @Resource
-    private DenseIndex denseIndex;
+    //该实例对应的桶的位置
+    private String position;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public FileSystemTable(String position, OnionDbTableIndex denseIndex) {
+        this.position = position;
+        this.denseIndex = denseIndex;
+    }
 
     public void write(MemoryCachePutResult memoryCachePutResult) throws IOException {
         try {
@@ -43,7 +47,7 @@ public class FileSystemService {
             //写入磁盘
             fileChannel.sequenceWrite(FileHelper.getWriteFile(), byteBuffer);
             //写入索引
-            denseIndex.setIndex(memoryCachePutResult.getIndexData());
+            denseIndex.setIndexMap(memoryCachePutResult.getIndexData());
         } finally {
             lock.writeLock().unlock();
         }

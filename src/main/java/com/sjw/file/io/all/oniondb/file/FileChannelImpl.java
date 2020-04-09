@@ -17,8 +17,16 @@ import java.nio.channels.FileChannel;
  * filechannel util工具
  */
 @Slf4j
-@Component
 public class FileChannelImpl implements FileStandardApi {
+
+    private FileChannelImpl (){}
+    public static final FileChannelImpl getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    private static class SingletonHolder {
+        private static final FileChannelImpl INSTANCE = new FileChannelImpl();
+    }
 
     @Override
     public void sequenceWrite(File file, ByteBuffer byteBuffer) throws IOException {

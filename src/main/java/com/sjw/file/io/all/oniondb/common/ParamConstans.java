@@ -32,4 +32,9 @@ public class ParamConstans {
      */
     public static final int VALUE_MAX_SIZE = Integer.MAX_VALUE;
 
+    /**
+     * hash桶数量
+     */
+    public static final int HASH_SIZE = 16;
+
 }

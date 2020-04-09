@@ -1,5 +1,7 @@
 package com.sjw.file.io.all.oniondb.index;
 
+import java.util.Map;
+
 /**
  * @author shijiawei
  * @version OnionDbTableIndex.java -> v 1.0
@@ -14,4 +16,8 @@ public interface OnionDbTableIndex {
      * @param offset -> 偏移量
      */
     void createIndex(String key, int offset);
+
+    void setIndexMap(Map<String, Integer> map);
+
+    Integer getIndex(String key);
 }

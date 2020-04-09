@@ -17,7 +17,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @date 2020/2/27
  * 前置内存表，用完内存表之后才会存入磁盘表
  */
-@Component
 @Slf4j
 public class MemoryCacheTable {
 
