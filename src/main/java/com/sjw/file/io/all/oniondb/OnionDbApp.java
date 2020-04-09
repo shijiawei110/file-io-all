@@ -2,9 +2,8 @@ package com.sjw.file.io.all.oniondb;
 
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
-import com.sjw.file.io.all.oniondb.common.PositionManager;
+import com.sjw.file.io.all.oniondb.manager.PositionManager;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
-import com.sjw.file.io.all.oniondb.file.FileSystemTable;
 import com.sjw.file.io.all.oniondb.helper.HashHelper;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.request.BatchSetRequest;

@@ -1,4 +1,4 @@
-package com.sjw.file.io.all.oniondb.common;
+package com.sjw.file.io.all.oniondb.manager;
 
 import com.google.common.collect.Maps;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
@@ -34,7 +34,7 @@ public class PositionManager {
         for (int i = 0; i < ParamConstans.HASH_SIZE; i++) {
             String position = String.valueOf(i);
             memoryCacheTables.put(position, new MemoryCacheTable());
-            fileSystemTables.put(position, new FileSystemTable(position, new DenseIndex()));
+            fileSystemTables.put(position, new FileSystemTable(position, new DenseIndex(), new FilePositonManager()));
         }
     }
 

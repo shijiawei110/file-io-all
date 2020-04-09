@@ -4,13 +4,14 @@ import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
-import com.sjw.file.io.all.oniondb.index.DenseIndex;
 import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
+import com.sjw.file.io.all.oniondb.manager.FilePositonManager;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.pojo.DbNodePojo;
 import com.sjw.file.io.all.oniondb.utils.ByteUtils;
 import com.sjw.file.io.all.oniondb.utils.NumberUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -29,14 +30,20 @@ public class FileSystemTable {
     //该实例持有的索引实例
     private OnionDbTableIndex denseIndex;
 
+    //文件位置管理者
+    private FilePositonManager filePositonManager;
+
     //该实例对应的桶的位置
     private String position;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FileSystemTable(String position, OnionDbTableIndex denseIndex) {
+    public FileSystemTable(String position, OnionDbTableIndex denseIndex, FilePositonManager filePositonManager) {
         this.position = position;
         this.denseIndex = denseIndex;
+        this.filePositonManager = filePositonManager;
+        //读取目前文件位置
+        filePositonManager.init(Integer.parseInt(position));
     }
 
     public void write(MemoryCachePutResult memoryCachePutResult) throws IOException {
@@ -44,8 +51,8 @@ public class FileSystemTable {
             //协议序列化
             ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
             lock.writeLock().lock();
-            //写入磁盘
-            fileChannel.sequenceWrite(FileHelper.getWriteFile(), byteBuffer);
+            //写入磁盘 todo 这里需要改成追加写入 而不是覆盖写入
+            fileChannel.sequenceWrite(getCurrentFile(), byteBuffer);
             //写入索引
             denseIndex.setIndexMap(memoryCachePutResult.getIndexData());
         } finally {
@@ -62,7 +69,7 @@ public class FileSystemTable {
                 throw OnionDbException.DB_INDEX_ERROR;
             }
             //读出节点数据
-            DbNodePojo dbNodePojo = readFileNodeData(offset);
+            DbNodePojo dbNodePojo = readFileNodeData(offset, getCurrentFile());
             //节点自检查
             dbNodePojo.checkKey(key);
             return dbNodePojo.getValue();
@@ -74,22 +81,26 @@ public class FileSystemTable {
     /**
      * 根据索引获取
      */
-    private DbNodePojo readFileNodeData(int offset) throws IOException {
+    private DbNodePojo readFileNodeData(int offset, File file) throws IOException {
         //读取key长度
-        byte[] keySizeBytes = fileChannel.randomRead(FileHelper.getReadFile(), offset, ParamConstans.KEY_FALG_BYTE_NUM);
+        byte[] keySizeBytes = fileChannel.randomRead(file, offset, ParamConstans.KEY_FALG_BYTE_NUM);
         int keySize = ByteUtils.getByteInt(keySizeBytes[0]);
         offset += ParamConstans.KEY_FALG_BYTE_NUM;
         //读取key数据
-        byte[] keyData = fileChannel.randomRead(FileHelper.getReadFile(), offset, keySize);
+        byte[] keyData = fileChannel.randomRead(file, offset, keySize);
         offset += keySize;
         //读取value长度
-        byte[] valueSizeBytes = fileChannel.randomRead(FileHelper.getReadFile(), offset, ParamConstans.VALUE_FALG_BYTE_NUM);
+        byte[] valueSizeBytes = fileChannel.randomRead(file, offset, ParamConstans.VALUE_FALG_BYTE_NUM);
         int valueSize = ByteUtils.getBytesInt(valueSizeBytes);
         offset += ParamConstans.VALUE_FALG_BYTE_NUM;
         //读取value数据
-        byte[] valueData = fileChannel.randomRead(FileHelper.getReadFile(), offset, valueSize);
+        byte[] valueData = fileChannel.randomRead(file, offset, valueSize);
         DbNodePojo dbNodePojo = new DbNodePojo(keySize, keyData, valueSize, valueData);
         return dbNodePojo;
+    }
+
+    private File getCurrentFile() {
+        return FileHelper.getCurrentFile(Integer.parseInt(position), filePositonManager.getCurrentIndex());
     }
 
 }
