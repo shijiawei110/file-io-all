@@ -2,9 +2,9 @@ package com.sjw.file.io.all.oniondb;
 
 import com.sjw.file.io.all.oniondb.common.OnionDbResult;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
-import com.sjw.file.io.all.oniondb.manager.PositionManager;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.HashHelper;
+import com.sjw.file.io.all.oniondb.manager.PositionManager;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.request.BatchSetRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -66,17 +66,17 @@ public class OnionDbApp {
     private int doSet(String key, String value) throws IOException {
         //基础check -> null等
         checkParams(key, value);
-        log.info("onion db set action -> key = {} | value = {}", key, value);
         //value 序列化选择，默认直接String，其他可以用protostuff等替换
         String vStr = value.toString();
         //检查字段，是否超过最大的key的size或者value的size
         checkMaxLimit(key, vStr);
         //获取桶值
         int position = HashHelper.hashPosition(key);
+        log.info("onion db set action -> key = {} | value = {} | position = {}", key, value, position);
         //memoryTable put
         MemoryCachePutResult memoryCachePutResult = positionManager.getMemoryCacheTable(position).put(key, vStr);
         if (memoryCachePutResult.isFull()) {
-            log.info("onion db memory table full -> size = {}", ParamConstans.MAX_NODE_SIZE);
+            log.info("onion db memory table full -> size = {} , position = {}", ParamConstans.MAX_NODE_SIZE, position);
             //执行数据入盘
             positionManager.getFileSystemTable(position).write(memoryCachePutResult);
         }

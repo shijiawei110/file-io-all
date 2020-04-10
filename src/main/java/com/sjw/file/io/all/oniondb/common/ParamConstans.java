@@ -35,6 +35,6 @@ public class ParamConstans {
     /**
      * hash桶数量
      */
-    public static final int HASH_SIZE = 16;
+    public static final int HASH_SIZE = 4;
 
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.file.FileSystemTable;
 import com.sjw.file.io.all.oniondb.index.DenseIndex;
-import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
 import com.sjw.file.io.all.oniondb.memory.MemoryCacheTable;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +33,7 @@ public class PositionManager {
         for (int i = 0; i < ParamConstans.HASH_SIZE; i++) {
             String position = String.valueOf(i);
             memoryCacheTables.put(position, new MemoryCacheTable());
-            fileSystemTables.put(position, new FileSystemTable(position, new DenseIndex(), new FilePositonManager()));
+            fileSystemTables.put(position, new FileSystemTable(position, new DenseIndex(), new FilePositionManager()));
         }
     }
 

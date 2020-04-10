@@ -1,7 +1,6 @@
 package com.sjw.file.io.all.oniondb.file;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.File;
@@ -19,7 +18,9 @@ import java.nio.channels.FileChannel;
 @Slf4j
 public class FileChannelImpl implements FileStandardApi {
 
-    private FileChannelImpl (){}
+    private FileChannelImpl() {
+    }
+
     public static final FileChannelImpl getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -31,9 +32,13 @@ public class FileChannelImpl implements FileStandardApi {
     @Override
     public void sequenceWrite(File file, ByteBuffer byteBuffer) throws IOException {
         FileChannel fileChannel = getChannel(file);
-
         try {
-            fileChannel.write(byteBuffer);
+            if (file.exists()) {
+                //追加写
+                fileChannel.write(byteBuffer, file.length());
+            } else {
+                fileChannel.write(byteBuffer);
+            }
             //clear
             byteBuffer.clear();
             //回收堆外内存
@@ -74,4 +79,5 @@ public class FileChannelImpl implements FileStandardApi {
     private FileChannel getChannel(File file) throws IOException {
         return new RandomAccessFile(file, "rw").getChannel();
     }
+
 }

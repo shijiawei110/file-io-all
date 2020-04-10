@@ -84,6 +84,10 @@ public class FileHelper {
         return Integer.parseInt(fileName);
     }
 
+    public static File getMainFile(){
+        String path = getUserPath() + FILE_FILE_NAME;
+        return new File(path);
+    }
 
     private static String getUserPath() {
         return System.getProperty("user.dir");

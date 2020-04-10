@@ -5,7 +5,7 @@ import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
-import com.sjw.file.io.all.oniondb.manager.FilePositonManager;
+import com.sjw.file.io.all.oniondb.manager.FilePositionManager;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.pojo.DbNodePojo;
 import com.sjw.file.io.all.oniondb.utils.ByteUtils;
@@ -31,19 +31,19 @@ public class FileSystemTable {
     private OnionDbTableIndex denseIndex;
 
     //文件位置管理者
-    private FilePositonManager filePositonManager;
+    private FilePositionManager filePositionManager;
 
     //该实例对应的桶的位置
     private String position;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FileSystemTable(String position, OnionDbTableIndex denseIndex, FilePositonManager filePositonManager) {
+    public FileSystemTable(String position, OnionDbTableIndex denseIndex, FilePositionManager filePositionManager) {
         this.position = position;
         this.denseIndex = denseIndex;
-        this.filePositonManager = filePositonManager;
+        this.filePositionManager = filePositionManager;
         //读取目前文件位置
-        filePositonManager.init(Integer.parseInt(position));
+        filePositionManager.init(Integer.parseInt(position));
     }
 
     public void write(MemoryCachePutResult memoryCachePutResult) throws IOException {
@@ -51,7 +51,7 @@ public class FileSystemTable {
             //协议序列化
             ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
             lock.writeLock().lock();
-            //写入磁盘 todo 这里需要改成追加写入 而不是覆盖写入
+            //写入磁盘
             fileChannel.sequenceWrite(getCurrentFile(), byteBuffer);
             //写入索引
             denseIndex.setIndexMap(memoryCachePutResult.getIndexData());
@@ -100,7 +100,7 @@ public class FileSystemTable {
     }
 
     private File getCurrentFile() {
-        return FileHelper.getCurrentFile(Integer.parseInt(position), filePositonManager.getCurrentIndex());
+        return FileHelper.getCurrentFile(Integer.parseInt(position), filePositionManager.getCurrentIndex());
     }
 
 }
