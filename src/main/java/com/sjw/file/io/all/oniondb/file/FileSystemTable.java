@@ -2,7 +2,6 @@ package com.sjw.file.io.all.oniondb.file;
 
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
-import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
 import com.sjw.file.io.all.oniondb.manager.FilePositionManager;
@@ -14,8 +13,6 @@ import com.sjw.file.io.all.oniondb.utils.NumberUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shijiawei
@@ -27,55 +24,51 @@ public class FileSystemTable {
 
     private static final FileChannelImpl fileChannel = FileChannelImpl.getInstance();
 
-    //该实例持有的索引实例
-    private OnionDbTableIndex denseIndex;
-
     //文件位置管理者
     private FilePositionManager filePositionManager;
 
     //该实例对应的桶的位置
     private String position;
 
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
-
-    public FileSystemTable(String position, OnionDbTableIndex denseIndex, FilePositionManager filePositionManager) {
+    public FileSystemTable(String position, FilePositionManager filePositionManager) {
         this.position = position;
-        this.denseIndex = denseIndex;
         this.filePositionManager = filePositionManager;
         //读取目前文件位置
         filePositionManager.init(Integer.parseInt(position));
     }
 
     public void write(MemoryCachePutResult memoryCachePutResult) throws IOException {
-        try {
-            //协议序列化
-            ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
-            lock.writeLock().lock();
-            //写入磁盘
-            fileChannel.sequenceWrite(getCurrentFile(), byteBuffer);
-            //写入索引
-            denseIndex.setIndexMap(memoryCachePutResult.getIndexData());
-        } finally {
-            lock.writeLock().unlock();
-        }
+        //协议序列化
+        ByteBuffer byteBuffer = NodeSerializeHelper.serializeByteBuffer(memoryCachePutResult.getFullData(), memoryCachePutResult.getFullDataSize());
+        //写入磁盘
+        fileChannel.sequenceWrite(filePositionManager.getCurrentFile(), byteBuffer);
+        //写入索引
+        filePositionManager.getIndexCache().batchSetIndex(memoryCachePutResult.getIndexData());
+        //检查是否移动文件指针 -> 是的话移动并且创建新的内存索引
+        checkFileFullAndForwardIndex();
     }
 
     public String get(String key) throws IOException {
-        try {
-            lock.readLock().lock();
-            //取索引offset位置
-            Integer offset = denseIndex.getIndex(key);
-            if (NumberUtil.invalidNumber(offset)) {
-                throw OnionDbException.DB_INDEX_ERROR;
-            }
-            //读出节点数据
-            DbNodePojo dbNodePojo = readFileNodeData(offset, getCurrentFile());
-            //节点自检查
-            dbNodePojo.checkKey(key);
-            return dbNodePojo.getValue();
-        } finally {
-            lock.readLock().unlock();
+        //递归 读出节点数据
+        DbNodePojo dbNodePojo = searchFileNode(key, filePositionManager.getCurrentIndex());
+        //节点自检查
+        dbNodePojo.checkKey(key);
+        return dbNodePojo.getValue();
+    }
+
+    /**
+     * 根据key搜索 这个key所在的索引以及文件的index位置是哪个 ：递归
+     */
+    private DbNodePojo searchFileNode(String key, int currentIndex) throws IOException {
+        if (currentIndex <= 0) {
+            throw OnionDbException.DB_INDEX_ERROR;
         }
+        OnionDbTableIndex indexCache = filePositionManager.getIndexCacheByKey(currentIndex);
+        Integer offset = indexCache.getIndex(key);
+        if (NumberUtil.invalidNumber(offset)) {
+            return searchFileNode(key, currentIndex - 1);
+        }
+        return readFileNodeData(offset, filePositionManager.getFileByFileIndex(currentIndex));
     }
 
     /**
@@ -99,8 +92,18 @@ public class FileSystemTable {
         return dbNodePojo;
     }
 
-    private File getCurrentFile() {
-        return FileHelper.getCurrentFile(Integer.parseInt(position), filePositionManager.getCurrentIndex());
+    /**
+     * 检查是否需要更新文件index
+     */
+    private synchronized void checkFileFullAndForwardIndex() {
+        //文件index + 1
+        File currentFile = filePositionManager.getCurrentFile();
+        if (currentFile.exists() && currentFile.length() > ParamConstans.DB_TABLE_FILE_MAX_BYTE_SIZE) {
+            filePositionManager.forwardIndex();
+        }
+        //生成新的索引cache
+        filePositionManager.createNewIndexCache();
     }
+
 
 }

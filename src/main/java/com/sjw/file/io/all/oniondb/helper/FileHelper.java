@@ -37,6 +37,11 @@ public class FileHelper {
         return new File(fileName);
     }
 
+    public static int getCurrentFileIndex(Integer position, Integer index) {
+        File file = getCurrentFile(position, index);
+        return getIndexFromFileName(file.getName());
+    }
+
     /**
      * 获取当前文件夹路径
      */
@@ -84,7 +89,7 @@ public class FileHelper {
         return Integer.parseInt(fileName);
     }
 
-    public static File getMainFile(){
+    public static File getMainFile() {
         String path = getUserPath() + FILE_FILE_NAME;
         return new File(path);
     }

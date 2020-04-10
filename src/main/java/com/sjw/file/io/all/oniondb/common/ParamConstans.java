@@ -37,4 +37,9 @@ public class ParamConstans {
      */
     public static final int HASH_SIZE = 4;
 
+    /**
+     * 单个文件的最大字节数
+     */
+    public static final int DB_TABLE_FILE_MAX_BYTE_SIZE = 20;
+
 }

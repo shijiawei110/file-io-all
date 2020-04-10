@@ -1,5 +1,7 @@
 package com.sjw.file.io.all.oniondb.index;
 
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 
 /**
@@ -10,14 +12,12 @@ import java.util.Map;
  * 磁盘索引详见 sstable的 index_block设计 ：https://blog.csdn.net/ws1296931325/article/details/86635751
  */
 public interface OnionDbTableIndex {
-    /**
-     * 创建索引
-     * @param key -> 键值
-     * @param offset -> 偏移量
-     */
-    void createIndex(String key, int offset);
 
-    void setIndexMap(Map<String, Integer> map);
+    Map<String, Integer> indexMap = Maps.newConcurrentMap();
+
+    void setIndex(String key, int offset);
+
+    void batchSetIndex(Map<String, Integer> indexs);
 
     Integer getIndex(String key);
 }

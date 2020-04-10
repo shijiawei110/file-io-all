@@ -2,7 +2,6 @@ package com.sjw.file.io.all.oniondb.index;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -15,17 +14,16 @@ import java.util.Map;
 @Slf4j
 public class DenseIndex implements OnionDbTableIndex {
 
-    private Map<String, Integer> indexMap = Maps.newHashMap();
-
     @Override
-    public void createIndex(String key, int offset) {
+    public void setIndex(String key, int offset) {
         indexMap.put(key, offset);
     }
 
     @Override
-    public void setIndexMap(Map<String, Integer> map) {
-        indexMap = map;
+    public void batchSetIndex(Map<String, Integer> indexs) {
+        indexMap.putAll(indexs);
     }
+
     @Override
     public Integer getIndex(String key) {
         return indexMap.get(key);

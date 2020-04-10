@@ -4,12 +4,9 @@ import com.google.common.collect.Maps;
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shijiawei
@@ -21,40 +18,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MemoryCacheTable {
 
     private TreeMap<String, String> tree = Maps.newTreeMap();
-
-    /**
-     * 读写锁控制 (默认非公平锁)
-     */
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
-
     //todo  需要维护一个墓碑表，表示一个数据被删除
 
     /**
      * 单个put
      */
     public MemoryCachePutResult put(String k, String v) {
-        try {
-            lock.writeLock().lock();
-            tree.put(k, v);
-            //检测是否full
-            if (isFull()) {
-                //reset and get map
-                return reset();
-            } else {
-                return MemoryCachePutResult.success(1);
-            }
-        } finally {
-            lock.writeLock().unlock();
+        tree.put(k, v);
+        //检测是否full
+        if (isFull()) {
+            //reset and get map
+            return reset();
+        } else {
+            return MemoryCachePutResult.success(1);
         }
     }
 
     public String get(String key) {
-        try {
-            lock.readLock().lock();
-            return tree.get(key);
-        } finally {
-            lock.readLock().unlock();
-        }
+        return tree.get(key);
     }
 
     /**

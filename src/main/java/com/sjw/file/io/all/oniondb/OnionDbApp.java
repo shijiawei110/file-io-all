@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shijiawei
@@ -29,8 +31,14 @@ public class OnionDbApp {
 
     private PositionManager positionManager;
 
+    /**
+     * 读写锁控制 (默认非公平锁)
+     */
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
+
     public OnionDbResult set(String key, String value) {
         try {
+            lock.writeLock().lock();
             int result = doSet(key, value);
             return OnionDbResult.successResult(result);
         } catch (OnionDbException e) {
@@ -39,6 +47,8 @@ public class OnionDbApp {
         } catch (Exception e) {
             log.error("onion db system error", e);
             return OnionDbResult.failSystemResult(e.getMessage());
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
@@ -48,6 +58,7 @@ public class OnionDbApp {
             return OnionDbResult.successResult(resultCount);
         }
         try {
+            lock.writeLock().lock();
             for (BatchSetRequest batchSetRequest : requests) {
                 int result = doSet(batchSetRequest.getKey(), batchSetRequest.getValue());
                 resultCount += result;
@@ -59,9 +70,38 @@ public class OnionDbApp {
         } catch (Exception e) {
             log.error("onion db system error", e);
             return OnionDbResult.failSystemResult(e.getMessage());
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
+    public OnionDbResult get(String key) {
+        try {
+            checkParams(key);
+            checkKeyMaxLimit(key);
+
+            lock.readLock().lock();
+            //获取桶值
+            int position = HashHelper.hashPosition(key);
+            //首先查memory table
+            String memResult = positionManager.getMemoryCacheTable(position).get(key);
+            if (null != memResult) {
+                return OnionDbResult.successResult(memResult);
+            }
+            //查磁盘
+            String dbResult = positionManager.getFileSystemTable(position).get(key);
+            return OnionDbResult.successResult(dbResult);
+        } catch (OnionDbException e) {
+            log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
+            return OnionDbResult.failResult(e);
+        } catch (Exception e) {
+            log.error("onion db system error", e);
+            return OnionDbResult.failSystemResult(e.getMessage());
+        }finally {
+            lock.readLock().unlock();
+        }
+
+    }
 
     private int doSet(String key, String value) throws IOException {
         //基础check -> null等
@@ -82,31 +122,6 @@ public class OnionDbApp {
         }
         return memoryCachePutResult.getSetNum();
     }
-
-    public OnionDbResult get(String key) {
-        try {
-            checkParams(key);
-            checkKeyMaxLimit(key);
-            //获取桶值
-            int position = HashHelper.hashPosition(key);
-            //首先查memory table
-            String memResult = positionManager.getMemoryCacheTable(position).get(key);
-            if (null != memResult) {
-                return OnionDbResult.successResult(memResult);
-            }
-            //查磁盘
-            String dbResult = positionManager.getFileSystemTable(position).get(key);
-            return OnionDbResult.successResult(dbResult);
-        } catch (OnionDbException e) {
-            log.info("onion db biz error -> key = {} , msg = {} , stack = {}", key, e.getMsg(), ExceptionUtils.getStackTrace(e));
-            return OnionDbResult.failResult(e);
-        } catch (Exception e) {
-            log.error("onion db system error", e);
-            return OnionDbResult.failSystemResult(e.getMessage());
-        }
-
-    }
-
 
     private void checkParams(String... params) {
         for (String str : params) {
