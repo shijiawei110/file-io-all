@@ -10,12 +10,14 @@ public class OnionDbException extends RuntimeException {
 
     private static final long serialVersionUID = -5911421837961135783L;
 
-    public static final OnionDbException REQUEST_PARAM_ERROR= new OnionDbException(10001, "入参信息错误");
-    public static final OnionDbException OUT_OF_MAX_LENGTH= new OnionDbException(10002, "超过最大存储长度");
-    public static final OnionDbException DATA_NULL_ERROR= new OnionDbException(10003, "数据为空");
-    public static final OnionDbException DB_INDEX_ERROR= new OnionDbException(10004, "磁盘索引未找到");
-    public static final OnionDbException DB_KEY_BLANK= new OnionDbException(10005, "磁盘数据节点key值为空");
-    public static final OnionDbException DB_KEY_DIFF_TO_REQUEST_KEY= new OnionDbException(10006, "读取磁盘数据节点key对比错误");
+    public static final OnionDbException REQUEST_PARAM_ERROR = new OnionDbException(10001, "入参信息错误");
+    public static final OnionDbException OUT_OF_MAX_LENGTH = new OnionDbException(10002, "超过最大存储长度");
+    public static final OnionDbException DATA_NULL_ERROR = new OnionDbException(10003, "数据为空");
+    public static final OnionDbException DB_INDEX_ERROR = new OnionDbException(10004, "磁盘索引未找到");
+    public static final OnionDbException DB_KEY_BLANK = new OnionDbException(10005, "磁盘数据节点key值为空");
+    public static final OnionDbException DB_KEY_DIFF_TO_REQUEST_KEY = new OnionDbException(10006, "读取磁盘数据节点key对比错误");
+    public static final OnionDbException OUT_OF_MAX_BATCH_SET_NUM = new OnionDbException(10007, "超出最大批处理数量");
+    public static final OnionDbException OUT_OF_MAX_BATCH_GET_NUM = new OnionDbException(10008, "超出最大批处理数量");
 
 
     /**

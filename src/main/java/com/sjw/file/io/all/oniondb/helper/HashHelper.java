@@ -7,7 +7,6 @@ import com.sjw.file.io.all.oniondb.common.ParamConstans;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 /**
  * hash helper
@@ -17,9 +16,9 @@ public class HashHelper {
     private static final Charset charset = StandardCharsets.UTF_8;
 
 
-    public static int hashPosition(String key) {
+    public static String hashPosition(String key) {
         int hashValue = doHash(key);
-        return doPosition(hashValue);
+        return String.valueOf(doPosition(hashValue));
     }
 
 

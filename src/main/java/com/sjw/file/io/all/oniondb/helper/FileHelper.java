@@ -94,6 +94,28 @@ public class FileHelper {
         return new File(path);
     }
 
+    public static void clearFilesForTest(){
+        doClearFiles(getMainFile());
+    }
+    private static void doClearFiles(File file) {
+        File[] files = file.listFiles();
+        if (null == files || files.length <= 0) {
+            return;
+        }
+        //遍历该目录下的文件对象
+        for (File f : files) {
+            //打印文件名
+            String name = file.getName();
+            //判断子目录是否存在子目录,如果是文件则删除
+            if (f.isDirectory()) {
+                doClearFiles(f);
+            } else {
+                f.delete();
+            }
+        }
+    }
+
+
     private static String getUserPath() {
         return System.getProperty("user.dir");
     }

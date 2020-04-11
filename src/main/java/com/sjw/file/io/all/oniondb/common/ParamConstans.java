@@ -33,6 +33,16 @@ public class ParamConstans {
     public static final int VALUE_MAX_SIZE = Integer.MAX_VALUE;
 
     /**
+     * 最大批set数量
+     */
+    public static final int MAX_BATCH_SET_NUM = 100;
+
+    /**
+     * 最大批get数量
+     */
+    public static final int MAX_BATCH_GET_NUM = 100;
+
+    /**
      * hash桶数量
      */
     public static final int HASH_SIZE = 4;
@@ -40,6 +50,6 @@ public class ParamConstans {
     /**
      * 单个文件的最大字节数
      */
-    public static final int DB_TABLE_FILE_MAX_BYTE_SIZE = 20;
+    public static final int DB_TABLE_FILE_MAX_BYTE_SIZE = 100;
 
 }
