@@ -9,6 +9,7 @@ import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.pojo.DbNodePojo;
 import com.sjw.file.io.all.oniondb.utils.ByteUtils;
 import com.sjw.file.io.all.oniondb.utils.NumberUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.nio.ByteBuffer;
  * @date 2020/2/28
  * 对应文件系统表
  */
+@Slf4j
 public class FileSystemTable {
 
     private static final FileChannelImpl fileChannel = FileChannelImpl.getInstance();
@@ -45,7 +47,7 @@ public class FileSystemTable {
         //写入索引
         filePositionManager.getIndexCache().batchSetIndex(memoryCachePutResult.getIndexData());
         //检查是否移动文件指针 -> 是的话移动并且创建新的内存索引
-        checkFileFullAndForwardIndex();
+        checkFileFullAndForwardIndex(memoryCachePutResult.getFullDataSize());
     }
 
     public String get(String key) throws IOException {
@@ -95,14 +97,15 @@ public class FileSystemTable {
     /**
      * 检查是否需要更新文件index
      */
-    private synchronized void checkFileFullAndForwardIndex() {
+    private synchronized void checkFileFullAndForwardIndex(int dataSize) {
         //文件index + 1
         File currentFile = filePositionManager.getCurrentFile();
         if (currentFile.exists() && currentFile.length() > ParamConstans.DB_TABLE_FILE_MAX_BYTE_SIZE) {
+            log.info("file full so new a db file -> position = {} fileLength = {} dataSize = {}", position, currentFile.length(), dataSize);
             filePositionManager.forwardIndex();
+            //生成新的索引cache
+            filePositionManager.createNewIndexCache();
         }
-        //生成新的索引cache
-        filePositionManager.createNewIndexCache();
     }
 
 

@@ -10,7 +10,7 @@ public class ParamConstans {
     /**
      * 内存表最大的节点个数
      **/
-    public static final int MAX_NODE_SIZE = 5;
+    public static final int MAX_NODE_SIZE = 50;
 
     /**
      * key长度的占位符的字节数
@@ -50,6 +50,6 @@ public class ParamConstans {
     /**
      * 单个文件的最大字节数
      */
-    public static final int DB_TABLE_FILE_MAX_BYTE_SIZE = 100;
+    public static final int DB_TABLE_FILE_MAX_BYTE_SIZE = 3000;
 
 }
