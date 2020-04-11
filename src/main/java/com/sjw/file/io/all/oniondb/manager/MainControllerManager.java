@@ -46,7 +46,7 @@ public class MainControllerManager {
         checkMaxLimit(key, vStr);
         //获取桶值
         String position = HashHelper.hashPosition(key);
-        log.info("onion db set action -> key = {} | value = {} | position = {}", key, value, position);
+//        log.info("onion db set action -> key = {} | value = {} | position = {}", key, value, position);
         MainControllerHolder holder = getHolder(position);
         try {
             //lock

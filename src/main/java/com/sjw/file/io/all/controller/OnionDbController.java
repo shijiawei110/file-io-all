@@ -27,18 +27,13 @@ public class OnionDbController {
         return onionDbApp.set(key, value);
     }
 
-    @PostMapping("/batch/set")
+    @PostMapping("/write/batchset")
     public OnionDbResult batchSet(@RequestBody List<BatchSetRequest> requests) {
         return onionDbApp.batchSet(requests);
     }
 
-    @GetMapping("/write/get")
+    @GetMapping("/read/get")
     public OnionDbResult set(@RequestParam("key") String key) {
         return onionDbApp.get(key);
-    }
-
-    @GetMapping("/write/test")
-    public OnionDbResult testSet() {
-        return null;
     }
 }

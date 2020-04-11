@@ -27,6 +27,9 @@ public class FilePositionManager {
 
 
     public void init(Integer position) {
+        //todo 为了测试先删除所有磁盘数据
+        FileHelper.clearFilesForTest();
+
         this.position = position;
         //获取文件夹路径
         String path = FileHelper.getCurrentFilePath(position);

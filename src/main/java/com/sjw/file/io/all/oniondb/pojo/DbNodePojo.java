@@ -2,6 +2,7 @@ package com.sjw.file.io.all.oniondb.pojo;
 
 import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
  * 文件kev节点协议的格式为  | key的长度(1字节) | key的字节数据包 | value的长度(4字节) | value的字节数据包 |
  */
 @Data
+@Slf4j
 public class DbNodePojo {
     private int keySize;
     private byte[] keyData;
@@ -36,6 +38,7 @@ public class DbNodePojo {
             throw OnionDbException.DB_KEY_BLANK;
         }
         if (!key.equals(dbKey)) {
+            log.info("check key not equals to db -> key = {} , dbkey = {}", key, dbKey);
             throw OnionDbException.DB_KEY_DIFF_TO_REQUEST_KEY;
         }
     }
