@@ -1,7 +1,5 @@
 package com.sjw.file.io.all.oniondb.index;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
 
 /**
@@ -13,11 +11,7 @@ import java.util.Map;
  */
 public interface OnionDbTableIndex {
 
-    Map<String, Integer> indexMap = Maps.newConcurrentMap();
-
-    void setIndex(String key, int offset);
-
-    void batchSetIndex(Map<String, Integer> indexs);
+    void batchSetIndex(Map<String, Integer> indexs, Integer offset);
 
     Integer getIndex(String key);
 }

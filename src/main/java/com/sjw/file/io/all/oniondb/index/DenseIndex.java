@@ -1,7 +1,6 @@
 package com.sjw.file.io.all.oniondb.index;
 
 import com.google.common.collect.Maps;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -11,17 +10,16 @@ import java.util.Map;
  * @date 2020/3/6
  * 密集索引 ：每个kv都创建内存索引
  */
-@Slf4j
 public class DenseIndex implements OnionDbTableIndex {
 
-    @Override
-    public void setIndex(String key, int offset) {
-        indexMap.put(key, offset);
-    }
+    Map<String, Integer> indexMap = Maps.newHashMap();
 
     @Override
-    public void batchSetIndex(Map<String, Integer> indexs) {
-        indexMap.putAll(indexs);
+    public void batchSetIndex(Map<String, Integer> indexs, Integer offset) {
+        indexs.forEach((k, v) -> {
+            int finalOffset = v + offset;
+            indexMap.put(k, finalOffset);
+        });
     }
 
     @Override

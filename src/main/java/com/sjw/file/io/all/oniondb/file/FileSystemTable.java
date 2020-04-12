@@ -1,14 +1,12 @@
 package com.sjw.file.io.all.oniondb.file;
 
 import com.sjw.file.io.all.oniondb.common.ParamConstans;
-import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.NodeSerializeHelper;
 import com.sjw.file.io.all.oniondb.index.OnionDbTableIndex;
 import com.sjw.file.io.all.oniondb.manager.FilePositionManager;
 import com.sjw.file.io.all.oniondb.memory.MemoryCachePutResult;
 import com.sjw.file.io.all.oniondb.pojo.DbNodePojo;
 import com.sjw.file.io.all.oniondb.utils.ByteUtils;
-import com.sjw.file.io.all.oniondb.utils.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -45,7 +43,7 @@ public class FileSystemTable {
         //写入磁盘
         fileChannel.sequenceWrite(filePositionManager.getCurrentFile(), byteBuffer);
         //写入索引
-        filePositionManager.getIndexCache().batchSetIndex(memoryCachePutResult.getIndexData());
+        filePositionManager.batchSetIndex(memoryCachePutResult.getIndexData(), memoryCachePutResult.getFullDataSize());
         //检查是否移动文件指针 -> 是的话移动并且创建新的内存索引
         checkFileFullAndForwardIndex(memoryCachePutResult.getFullDataSize());
     }
@@ -53,6 +51,10 @@ public class FileSystemTable {
     public String get(String key) throws IOException {
         //递归 读出节点数据
         DbNodePojo dbNodePojo = searchFileNode(key, filePositionManager.getCurrentIndex());
+        if (null == dbNodePojo) {
+            //找不到key
+            return null;
+        }
         //节点自检查
         dbNodePojo.checkKey(key);
         return dbNodePojo.getValue();
@@ -63,11 +65,11 @@ public class FileSystemTable {
      */
     private DbNodePojo searchFileNode(String key, int currentIndex) throws IOException {
         if (currentIndex <= 0) {
-            throw OnionDbException.DB_INDEX_ERROR;
+            return null;
         }
         OnionDbTableIndex indexCache = filePositionManager.getIndexCacheByKey(currentIndex);
         Integer offset = indexCache.getIndex(key);
-        if (NumberUtil.invalidNumber(offset)) {
+        if (null == offset || offset < 0) {
             return searchFileNode(key, currentIndex - 1);
         }
         return readFileNodeData(offset, filePositionManager.getFileByFileIndex(currentIndex));

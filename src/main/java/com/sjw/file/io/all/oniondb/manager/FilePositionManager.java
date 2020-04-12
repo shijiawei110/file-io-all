@@ -22,6 +22,9 @@ public class FilePositionManager {
     //目前游标位置
     private volatile int currentIndex = 1;
 
+    //索引记录的偏移量
+    private volatile int cacheIndexOffset = 0;
+
     //各个index的索引cache
     private Map<String, OnionDbTableIndex> indexCaches = Maps.newHashMap();
 
@@ -65,6 +68,13 @@ public class FilePositionManager {
         return indexCaches.get(String.valueOf(fileIndex));
     }
 
+    public synchronized void batchSetIndex(Map<String, Integer> indexData, int indexByteSize) {
+        //设置索引
+        getIndexCache().batchSetIndex(indexData, cacheIndexOffset);
+        //增加偏移量
+        cacheIndexOffset += indexByteSize;
+    }
+
     public File getFileByFileIndex(int fileIndex) {
         return FileHelper.getCurrentFile(position, fileIndex);
     }
@@ -80,6 +90,8 @@ public class FilePositionManager {
     public synchronized void createNewIndexCache() {
         if (null == indexCaches.get(String.valueOf(currentIndex))) {
             indexCaches.put(String.valueOf(currentIndex), new DenseIndex());
+            //索引偏移量重置
+            cacheIndexOffset = 0;
         }
     }
 }

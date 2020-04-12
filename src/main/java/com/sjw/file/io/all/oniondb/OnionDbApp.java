@@ -37,9 +37,7 @@ public class OnionDbApp {
 
     @PreDestroy
     public void stop() {
-        //todo 测试用 -> 每次启动数据库清空主目录下的所有文件
         log.info("---------------------- onion db app stop ----------------------");
-        FileHelper.clearFilesForTest();
     }
 
     public OnionDbResult set(String key, String value) {
