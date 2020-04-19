@@ -6,6 +6,7 @@ import com.sjw.file.io.all.oniondb.exception.OnionDbException;
 import com.sjw.file.io.all.oniondb.helper.FileHelper;
 import com.sjw.file.io.all.oniondb.manager.MainControllerManager;
 import com.sjw.file.io.all.oniondb.request.BatchSetRequest;
+import com.sjw.file.io.all.oniondb.utils.ThreadPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -29,7 +30,7 @@ public class OnionDbApp {
     private MainControllerManager mainControllerManager;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         //todo 测试用 -> 每次启动数据库清空主目录下的所有文件
         log.info("---------------------- onion db app init ----------------------");
         FileHelper.clearFilesForTest();
@@ -37,6 +38,9 @@ public class OnionDbApp {
 
     @PreDestroy
     public void stop() {
+        FileHelper.clearFilesForTest();
+        //执行shutdown
+        ThreadPoolUtil.instance().shutdown();
         log.info("---------------------- onion db app stop ----------------------");
     }
 

@@ -35,7 +35,8 @@ public class FileChannelImpl implements FileStandardApi {
         try {
             if (file.exists()) {
                 //追加写
-                fileChannel.write(byteBuffer, file.length());
+//                fileChannel.write(byteBuffer, file.length());
+                fileChannel.write(byteBuffer);
             } else {
                 fileChannel.write(byteBuffer);
             }

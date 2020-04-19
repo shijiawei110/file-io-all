@@ -101,13 +101,13 @@ public class FileSystemTable {
      */
     private synchronized void checkFileFullAndForwardIndex(int dataSize) {
         //文件index + 1
-        File currentFile = filePositionManager.getCurrentFile();
-        if (currentFile.exists() && currentFile.length() > ParamConstans.DB_TABLE_FILE_MAX_BYTE_SIZE) {
-            log.info("file full so new a db file -> position = {} fileLength = {} dataSize = {}", position, currentFile.length(), dataSize);
-            filePositionManager.forwardIndex();
-            //生成新的索引cache
-            filePositionManager.createNewIndexCache();
-        }
+//        File currentFile = filePositionManager.getCurrentFile();
+//        if (currentFile.exists() && currentFile.length() > ParamConstans.DB_TABLE_FILE_MAX_BYTE_SIZE) {
+//        log.info("file full so new a db file -> position = {} fileLength = {} dataSize = {}", position, currentFile.length(), dataSize);
+        filePositionManager.forwardIndex();
+        //生成新的索引cache
+        filePositionManager.createNewIndexCache();
+//        }
     }
 
 
