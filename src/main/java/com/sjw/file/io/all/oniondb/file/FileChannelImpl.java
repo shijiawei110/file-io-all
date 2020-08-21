@@ -1,6 +1,7 @@
 package com.sjw.file.io.all.oniondb.file;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.File;
@@ -16,36 +17,16 @@ import java.nio.channels.FileChannel;
  * filechannel util工具
  */
 @Slf4j
+@Component
 public class FileChannelImpl implements FileStandardApi {
-
-    private FileChannelImpl() {
-    }
-
-    public static final FileChannelImpl getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    private static class SingletonHolder {
-        private static final FileChannelImpl INSTANCE = new FileChannelImpl();
-    }
 
     @Override
     public void sequenceWrite(File file, ByteBuffer byteBuffer) throws IOException {
         FileChannel fileChannel = getChannel(file);
+
         try {
-            if (file.exists()) {
-                //追加写
-//                fileChannel.write(byteBuffer, file.length());
-                fileChannel.write(byteBuffer);
-            } else {
-                fileChannel.write(byteBuffer);
-            }
-            //clear
-            byteBuffer.clear();
-            //回收堆外内存
-            if (byteBuffer.isDirect()) {
-                ((DirectBuffer) byteBuffer).cleaner().clean();
-            }
+            fileChannel.write(byteBuffer);
+            clearByteBuffer(byteBuffer);
         } finally {
             fileChannel.close();
         }
@@ -71,10 +52,22 @@ public class FileChannelImpl implements FileStandardApi {
             //切换到读模式
             buffer.flip();
             buffer.get(result);
+            clearByteBuffer(buffer);
         } finally {
             fileChannel.close();
         }
         return result;
+    }
+
+    private void clearByteBuffer(ByteBuffer byteBuffer) {
+        //clear
+        if (null != byteBuffer) {
+            byteBuffer.clear();
+            //回收堆外内存
+            if (byteBuffer.isDirect()) {
+                ((DirectBuffer) byteBuffer).cleaner().clean();
+            }
+        }
     }
 
     private FileChannel getChannel(File file) throws IOException {
